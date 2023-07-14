@@ -4,82 +4,89 @@
  *
  */
 
-const PoweredUP = require("..");
+import PoweredUP from '..'
 
-const poweredUP = new PoweredUP.PoweredUP();
-poweredUP.scan(); // Start scanning
+const poweredUP = new PoweredUP.PoweredUP()
+poweredUP.scan() // Start scanning
 
-console.log("Looking for Vernie and Remote...");
+console.log('Looking for Vernie and Remote...')
 
-let vernie = null;
-let remote = null;
+let vernie = null
+let remote = null
 
-poweredUP.on("discover", async (hub) => { // Wait to discover Vernie and Remote
+poweredUP.on('discover', async (hub) => {
+  // Wait to discover Vernie and Remote
 
-    if (hub.type === PoweredUP.Consts.HubType.MOVE_HUB) {
+  if (hub.type === PoweredUP.Consts.HubType.MOVE_HUB) {
+    vernie = hub
+    await vernie.connect()
+    const led = await vernie.waitForDeviceByType(
+      PoweredUP.Consts.DeviceType.HUB_LED
+    )
+    led.setColor(PoweredUP.Consts.Color.BLUE)
+    console.log(`Connected to Vernie (${vernie.name})!`)
+  } else if (hub.type === PoweredUP.Consts.HubType.REMOTE_CONTROL) {
+    remote = hub
 
-        vernie = hub;
-        await vernie.connect();
-        const led = await vernie.waitForDeviceByType(PoweredUP.Consts.DeviceType.HUB_LED);
-        led.setColor(PoweredUP.Consts.Color.BLUE);
-        console.log(`Connected to Vernie (${vernie.name})!`);
+    remote.on('remoteButton', async (device, { event }) => {
+      if (vernie) {
+        const leftTrack = await vernie.waitForDeviceAtPort('A')
+        const rightTrack = await vernie.waitForDeviceAtPort('B')
+        const head = await vernie.waitForDeviceAtPort('D')
 
-    } else if (hub.type === PoweredUP.Consts.HubType.REMOTE_CONTROL) {
-        remote = hub;
+        console.log(event)
 
-        remote.on("remoteButton", async (device, { event }) => {
-            if (vernie) {
-                const leftTrack = await vernie.waitForDeviceAtPort("A");
-                const rightTrack = await vernie.waitForDeviceAtPort("B");
-                const head = await vernie.waitForDeviceAtPort("D");
+        switch (event) {
+          case PoweredUP.Consts.ButtonState.UP: { // If up is pressed, move the track forward
+            console.log(device.portName)
+            device.portName === 'LEFT'
+              ? leftTrack.setSpeed(50)
+              : rightTrack.setSpeed(50)
+            break
+          }
+          case PoweredUP.Consts.ButtonState.DOWN: { // If down is pressed, move the track backwards
+            device.portName === 'LEFT'
+              ? leftTrack.setSpeed(-50)
+              : rightTrack.setSpeed(-50)
+            break
+          }
+          case PoweredUP.Consts.ButtonState.RELEASED: { // Stop the track when the button is released
+            device.portName === 'LEFT'
+              ? leftTrack.setPower(0)
+              : rightTrack.setPower(0)
+            break
+          }
+          case PoweredUP.Consts.ButtonState.STOP: { // Move the head left or right when a red button is pressed
+            await head.rotateByDegrees(
+              35,
+              device.portName === 'LEFT' ? -20 : 20
+            )
+            break
+          }
+        }
+      }
+    })
 
-                console.log(event);
+    hub.on('button', async ({ event }) => {
+      console.log(event)
+      if (vernie) {
+        const head = await vernie.waitForDeviceAtPort('D')
+        if (event === PoweredUP.Consts.ButtonState.PRESSED) {
+          await head.rotateByDegrees(80, 20)
+          await head.rotateByDegrees(80, -20)
+        }
+      }
+    })
 
-                switch (event) {
-                    case PoweredUP.Consts.ButtonState.UP: // If up is pressed, move the track forward
-                    {
-                        console.log(device.portName);
-                        device.portName === "LEFT" ? leftTrack.setSpeed(50) : rightTrack.setSpeed(50);
-                        break;
-                    }
-                    case PoweredUP.Consts.ButtonState.DOWN: // If down is pressed, move the track backwards
-                    {
-                        device.portName === "LEFT" ? leftTrack.setSpeed(-50) : rightTrack.setSpeed(-50);
-                        break;
-                    }
-                    case PoweredUP.Consts.ButtonState.RELEASED: // Stop the track when the button is released
-                    {
-                        device.portName === "LEFT" ? leftTrack.setPower(0) : rightTrack.setPower(0);
-                        break;
-                    }
-                    case PoweredUP.Consts.ButtonState.STOP: // Move the head left or right when a red button is pressed
-                    {
-                        await head.rotateByDegrees(35, device.portName === "LEFT" ? -20 : 20);
-                        break;
-                    }
-                }
-            }
-        });
+    await remote.connect()
+    const led = await remote.waitForDeviceByType(
+      PoweredUP.Consts.DeviceType.HUB_LED
+    )
+    led.setColor(PoweredUP.Consts.Color.BLUE)
+    console.log(`Connected to Powered UP Remote (${remote.name})!`)
+  }
 
-        hub.on("button", async ({ event }) => {
-            console.log(event);
-            if (vernie) {
-                const head = await vernie.waitForDeviceAtPort("D");
-                if (event === PoweredUP.Consts.ButtonState.PRESSED) {
-                    await head.rotateByDegrees(80, 20);
-                    await head.rotateByDegrees(80, -20);
-                }
-            }
-        });
-
-        await remote.connect();
-        const led = await remote.waitForDeviceByType(PoweredUP.Consts.DeviceType.HUB_LED);
-        led.setColor(PoweredUP.Consts.Color.BLUE);
-        console.log(`Connected to Powered UP Remote (${remote.name})!`);
-    }
-
-    if (vernie && remote) {
-        console.log("You're now ready to go!");
-    }
-    
-});
+  if (vernie && remote) {
+    console.log("You're now ready to go!")
+  }
+})

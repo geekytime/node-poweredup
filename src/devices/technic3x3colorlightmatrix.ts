@@ -1,64 +1,57 @@
-import { Color } from "../color";
-
-import { Device } from "./device";
-
-import { IDeviceInterface } from "../interfaces";
-
-import * as Consts from "../consts";
+import { Color } from '../color.js'
+import * as Consts from '../consts.js'
+import { IDeviceInterface } from '../interfaces.js'
+import { Device } from './device.js'
 
 /**
  * @class Technic3x3ColorLightMatrix
  * @extends Device
  */
 export class Technic3x3ColorLightMatrix extends Device {
+  constructor(hub: IDeviceInterface, portId: number) {
+    super(hub, portId, {}, Consts.DeviceType.TECHNIC_3X3_COLOR_LIGHT_MATRIX)
+  }
 
-
-    constructor (hub: IDeviceInterface, portId: number) {
-        super(hub, portId, {}, Consts.DeviceType.TECHNIC_3X3_COLOR_LIGHT_MATRIX);
-    }
-
-
-    /**
-     * Set the LED matrix, one color per LED
-     * @method Technic3x3ColorLightMatrix#setMatrix
-     * @param {Color[] | Color} colors Array of 9 colors, 9 Color objects, or a single color
-     * @returns {Promise} Resolved upon successful issuance of the command.
-     */
-    public setMatrix (colors: number[] | number) {
-        return new Promise<void>((resolve) => {
-            this.subscribe(Mode.PIX_0);
-            const colorArray = new Array(9);
-            for (let i = 0; i < colorArray.length; i++) {
-                if (typeof colors ===  'number') {
-                    // @ts-ignore
-                    colorArray[i] = colors + (10 << 4);
-                }
-                // @ts-ignore
-                if (colors[i] instanceof Color) {
-                    // @ts-ignore
-                    colorArray[i] = colors[i].toValue();
-                }
-                // @ts-ignore
-                if (colors[i] === Consts.Color.NONE) {
-                    colorArray[i] = Consts.Color.NONE;
-                }
-                // @ts-ignore
-                if (colors[i] <= 10) {
-                    // @ts-ignore
-                    colorArray[i] = colors[i] + (10 << 4); // If a raw color value, set it to max brightness (10)
-                }
-            }
-            this.writeDirect(Mode.PIX_0, Buffer.from(colorArray));
-            return resolve();
-        });
-    }
-
-
+  /**
+   * Set the LED matrix, one color per LED
+   * @method Technic3x3ColorLightMatrix#setMatrix
+   * @param {Color[] | Color} colors Array of 9 colors, 9 Color objects, or a single color
+   * @returns {Promise} Resolved upon successful issuance of the command.
+   */
+  public setMatrix(colors: number[] | number | Color[] | Color) {
+    return new Promise<void>((resolve) => {
+      this.subscribe(TechnicColorLightMatrixMode.PIX_0)
+      const colorArray = new Array<number>(9)
+      for (let i = 0; i < colorArray.length; i++) {
+        if (typeof colors === 'number') {
+          colorArray[i] = colors + (10 << 4)
+        }
+        if (Array.isArray(colors) && colors[i] instanceof Color) {
+          colorArray[i] = (colors[i] as Color).toValue()
+        }
+        if (Array.isArray(colors) && colors[i] === Consts.Color.NONE) {
+          colorArray[i] = Consts.Color.NONE
+        }
+        if (
+          Array.isArray(colors) &&
+          typeof colors[i] === 'number' &&
+          (colors[i] as number) <= 10
+        ) {
+          colorArray[i] = (colors[i] as number) + (10 << 4) // If a raw color value, set it to max brightness (10)
+        }
+      }
+      this.writeDirect(
+        TechnicColorLightMatrixMode.PIX_0,
+        Buffer.from(colorArray)
+      )
+      return resolve()
+    })
+  }
 }
 
-export enum Mode {
-    LEV_0 = 0x00,
-    COL_0 = 0x01,
-    PIX_0 = 0x02,
-    TRANS = 0x03
+export enum TechnicColorLightMatrixMode {
+  LEV_0 = 0,
+  COL_0 = 1,
+  PIX_0 = 2,
+  TRANS = 3
 }

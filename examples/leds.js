@@ -4,7 +4,7 @@
  *
  */
 
-const PoweredUP = require("..");
+import PoweredUP from ".."
 
 const poweredUP = new PoweredUP.PoweredUP();
 poweredUP.scan(); // Start scanning for hubs
