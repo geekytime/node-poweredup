@@ -8,7 +8,7 @@ const debug = Debug('device')
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected'
 
-export class Device extends EventEmitter implements IBLEAbstraction {
+export class BFPeripheral extends EventEmitter implements IBLEAbstraction {
   public readonly peripheral: Peripheral
 
   private _characteristics: { [uuid: string]: Characteristic } = {}
@@ -28,7 +28,7 @@ export class Device extends EventEmitter implements IBLEAbstraction {
   }
 
   public static async create(peripheral: Peripheral) {
-    const device = new Device(peripheral)
+    const device = new BFPeripheral(peripheral)
     // HACK: this allows LPF2.0 hubs to send a second advertisement packet
     // consisting of the hub name before we try to read it
     await device.hasName()
