@@ -3,63 +3,75 @@ import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 import { IBLEAbstraction } from './interfaces.js'
+import { waitFor } from './utils.js'
 const debug = Debug('device')
+
+export type ConnectionState = 'disconnected' | 'connecting' | 'connected'
 
 export class Device extends EventEmitter implements IBLEAbstraction {
   public readonly peripheral: Peripheral
-
-  private _uuid: string
-  private _name: string = ''
 
   private _characteristics: { [uuid: string]: Characteristic } = {}
 
   private _mailbox: Buffer[] = []
 
-  private _connected: boolean = false
-  private _connecting: boolean = false
+  private connectionState: ConnectionState = 'disconnected'
 
-  constructor(peripheral: Peripheral) {
+  private constructor(peripheral: Peripheral) {
     super()
     this.peripheral = peripheral
-    this._uuid = peripheral.uuid
+
     peripheral.on('disconnect', () => {
-      this._connecting = false
-      this._connected = false
+      this.connectionState = 'disconnected'
       this.emit('disconnect')
     })
-    // NK: This hack allows LPF2.0 hubs to send a second advertisement packet consisting of the hub name before we try to read it
-    setTimeout(() => {
-      this._name = peripheral.advertisement.localName
-      this.emit('discoverComplete')
-    }, 1000)
+  }
+
+  public static async create(peripheral: Peripheral) {
+    const device = new Device(peripheral)
+    // HACK: this allows LPF2.0 hubs to send a second advertisement packet
+    // consisting of the hub name before we try to read it
+    await device.hasName()
+    return device
   }
 
   public get uuid() {
-    return this._uuid
+    return this.peripheral.uuid
   }
 
   public get name() {
-    return this._name
+    return this.peripheral.advertisement?.localName
+  }
+
+  public async hasName() {
+    const name = this.name
+    if (name) {
+      return name
+    }
+    return await waitFor({
+      timeoutMS: 1000,
+      retryMS: 20,
+      checkFn: () => !!this.name
+    })
   }
 
   public get connecting() {
-    return this._connecting
+    return this.connectionState === 'connecting'
   }
 
   public get connected() {
-    return this._connected
+    return this.connectionState === 'connected'
   }
 
   public connect() {
     return new Promise<void>((resolve, reject) => {
-      this._connecting = true
+      this.connectionState = 'connecting'
       this.peripheral.connect((err: string) => {
         if (err) {
           return reject(err)
         }
 
-        this._connecting = false
-        this._connected = true
+        this.connectionState = 'connected'
         return resolve()
       })
     })
@@ -68,8 +80,7 @@ export class Device extends EventEmitter implements IBLEAbstraction {
   public disconnect() {
     return new Promise<void>((resolve) => {
       this.peripheral.disconnect()
-      this._connecting = false
-      this._connected = false
+      this.connectionState = 'disconnected'
       return resolve()
     })
   }

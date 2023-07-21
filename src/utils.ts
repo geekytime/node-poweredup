@@ -125,7 +125,7 @@ export const waitFor = async ({
 }: {
   timeoutMS: number
   retryMS: number
-  checkFn: () => Promise<boolean>
+  checkFn: () => boolean | Promise<boolean>
   elapsed?: number
 }) => {
   const start = process.hrtime.bigint()

@@ -1,3 +1,4 @@
+import { Peripheral } from '@abandonware/noble'
 import { compareVersions } from 'compare-versions'
 import Debug from 'debug'
 
@@ -16,12 +17,6 @@ import { WeDo2SmartHub } from './wedo2smarthub.js'
 
 const debug = Debug('hub')
 
-/**
- * The Hub is emitted if the discovered device is a Hub.
- * @class Hub
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class Hub extends LPF2Hub {
   protected _currentPort = 0x3b
 
@@ -44,27 +39,26 @@ export class Hub extends LPF2Hub {
     }
   }
 
-  public static fromDevice(device: Device) {
-    if (HubType.IsWeDo2SmartHub(device.peripheral)) {
+  public static async fromPeripheral(peripheral: Peripheral) {
+    const device = await Device.create(peripheral)
+    if (HubType.IsWeDo2SmartHub(peripheral)) {
       return new WeDo2SmartHub(device)
-    } else if (HubType.IsMoveHub(device.peripheral)) {
+    } else if (HubType.IsMoveHub(peripheral)) {
       return new MoveHub(device)
-    } else if (HubType.IsHub(device.peripheral)) {
+    } else if (HubType.IsHub(peripheral)) {
       return new Hub(device)
-    } else if (HubType.IsRemoteControl(device.peripheral)) {
+    } else if (HubType.IsRemoteControl(peripheral)) {
       return new RemoteControl(device)
-    } else if (HubType.IsDuploTrainBase(device.peripheral)) {
+    } else if (HubType.IsDuploTrainBase(peripheral)) {
       return new DuploTrainBase(device)
-    } else if (HubType.IsTechnicSmallHub(device.peripheral)) {
+    } else if (HubType.IsTechnicSmallHub(peripheral)) {
       return new TechnicSmallHub(device)
-    } else if (HubType.IsTechnicMediumHub(device.peripheral)) {
+    } else if (HubType.IsTechnicMediumHub(peripheral)) {
       return new TechnicMediumHub(device)
-    } else if (HubType.IsMario(device.peripheral)) {
+    } else if (HubType.IsMario(peripheral)) {
       return new Mario(device)
     } else {
-      throw new Error(
-        `Unknown device/peripheral type: ${device.peripheral.uuid}`
-      )
+      throw new Error(`Unknown device/peripheral type: ${peripheral.uuid}`)
     }
   }
 }

@@ -8,10 +8,6 @@ import { BaseHub } from './basehub.js'
 const debug = Debug('lpf2hub')
 const modeInfoDebug = Debug('lpf2hubmodeinfo')
 
-/**
- * @class LPF2Hub
- * @extends BaseHub
- */
 export class LPF2Hub extends BaseHub {
   private _messageBuffer: Buffer = Buffer.alloc(0)
 
@@ -39,15 +35,10 @@ export class LPF2Hub extends BaseHub {
     await this._requestHubPropertyValue(
       Consts.HubPropertyPayload.PRIMARY_MAC_ADDRESS
     )
-    this.emit('connect')
+    this.emit('connect', this)
     debug('LPF2Hub connected')
   }
 
-  /**
-   * Shutdown the Hub.
-   * @method LPF2Hub#shutdown
-   * @returns {Promise} Resolved upon successful disconnect.
-   */
   public shutdown() {
     return this.send(
       Buffer.from([0x02, 0x01]),
@@ -55,12 +46,6 @@ export class LPF2Hub extends BaseHub {
     )
   }
 
-  /**
-   * Set the name of the Hub.
-   * @method LPF2Hub#setName
-   * @param {string} name New name of the hub (14 characters or less, ASCII only).
-   * @returns {Promise} Resolved upon successful issuance of command.
-   */
   public async setName(name: string) {
     if (name.length > 14) {
       throw new Error('Name must be 14 characters or less')
@@ -95,7 +80,7 @@ export class LPF2Hub extends BaseHub {
   }
 
   /**
-   * Combines two ports with into a single virtual port.
+   * Combines two ports into a single virtual port.
    *
    * Note: The devices attached to the ports must be of the same device type.
    * @method LPF2Hub#createVirtualPort

@@ -48,7 +48,7 @@ export class WeDo2SmartHub extends BaseHub {
       )
     }
     debug('Connect completed')
-    this.emit('connect')
+    this.emit('connect', this)
     this.postConnectInit()
   }
 

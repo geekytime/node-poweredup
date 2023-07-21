@@ -3,7 +3,6 @@ import noble from '@abandonware/noble'
 import Debug from 'debug'
 import { EventEmitter } from 'events'
 
-import { Device } from './device.js'
 import { ServiceIds } from './hub-type.js'
 import { BaseHub } from './hubs/basehub.js'
 import { Hub } from './hubs/hub.js'
@@ -108,26 +107,24 @@ export class Scanner extends EventEmitter {
 
   private handleDiscovery = async (peripheral: Peripheral) => {
     peripheral.removeAllListeners()
-    const device = new Device(peripheral)
 
-    const hub = Hub.fromDevice(device)
+    const hub = await Hub.fromPeripheral(peripheral)
+    hub.on('connect', this.handleHubConnect)
+    hub.on('disconnect', this.handleHubDisconnect)
 
-    device.on('discoverComplete', () => {
-      hub.on('connect', () => {
-        debug(`Hub ${hub.uuid} connected`)
-        this._connectedHubs[hub.uuid] = hub
-      })
+    debug(`Hub ${hub.uuid} discovered`)
+    this.emit('discover', hub)
+  }
 
-      hub.on('disconnect', () => {
-        debug(`Hub ${hub.uuid} disconnected`)
-        delete this._connectedHubs[hub.uuid]
+  private handleHubConnect = (hub: Hub) => {
+    debug(`Hub ${hub.uuid} connected`)
+    this._connectedHubs[hub.uuid] = hub
+  }
 
-        this.nobleStartScanning()
-      })
+  private handleHubDisconnect = (hub: Hub) => {
+    debug(`Hub ${hub.uuid} disconnected`)
+    delete this._connectedHubs[hub.uuid]
 
-      debug(`Hub ${hub.uuid} discovered`)
-
-      this.emit('discover', hub)
-    })
+    this.nobleStartScanning()
   }
 }
