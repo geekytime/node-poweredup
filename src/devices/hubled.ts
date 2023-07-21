@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 /**
@@ -7,7 +7,7 @@ import { Device } from './device.js'
  * @extends Device
  */
 export class HubLED extends Device {
-  constructor(hub: IDeviceInterface, portId: number) {
+  constructor(hub: BaseHub, portId: number) {
     super(hub, portId, {}, Consts.DeviceType.HUB_LED)
   }
 

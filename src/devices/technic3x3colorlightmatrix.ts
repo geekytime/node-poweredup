@@ -1,6 +1,6 @@
 import { Color } from '../color.js'
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 /**
@@ -8,7 +8,7 @@ import { Device } from './device.js'
  * @extends Device
  */
 export class Technic3x3ColorLightMatrix extends Device {
-  constructor(hub: IDeviceInterface, portId: number) {
+  constructor(hub: BaseHub, portId: number) {
     super(hub, portId, {}, Consts.DeviceType.TECHNIC_3X3_COLOR_LIGHT_MATRIX)
   }
 

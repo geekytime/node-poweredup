@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 /**
@@ -10,7 +10,7 @@ export class TechnicMediumHubTiltSensor extends Device {
   protected _impactThreshold: number = 10 // guess of default value
   protected _impactHoldoff: number = 10 // guess of default value
 
-  constructor(hub: IDeviceInterface, portId: number) {
+  constructor(hub: BaseHub, portId: number) {
     super(
       hub,
       portId,

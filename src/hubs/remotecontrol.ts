@@ -1,19 +1,13 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('remotecontrol')
 
-/**
- * The RemoteControl is emitted if the discovered device is a Remote Control.
- * @class RemoteControl
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class RemoteControl extends LPF2Hub {
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.REMOTE_CONTROL)
     debug('Discovered Powered UP Remote')
   }

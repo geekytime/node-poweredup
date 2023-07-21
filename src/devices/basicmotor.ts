@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp, mapSpeed } from '../utils.js'
 import { Device } from './device.js'
 
@@ -9,7 +9,7 @@ import { Device } from './device.js'
  */
 export class BasicMotor extends Device {
   constructor(
-    hub: IDeviceInterface,
+    hub: BaseHub,
     portId: number,
     modeMap: { [event: string]: number },
     type: Consts.DeviceType = Consts.DeviceType.UNKNOWN

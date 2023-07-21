@@ -1,7 +1,8 @@
 import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
+// import { BaseHub } from '../hubs/basehub.js'
 
 /**
  * @class Device
@@ -15,7 +16,7 @@ export class Device extends EventEmitter {
   protected _busy: boolean = false
   protected _finishedCallbacks: (() => void)[] = []
 
-  private _hub: IDeviceInterface
+  private _hub: BaseHub
   private _portId: number
   private _connected: boolean = true
   private _type: Consts.DeviceType
@@ -26,7 +27,7 @@ export class Device extends EventEmitter {
   private _eventTimer: NodeJS.Timer | null = null
 
   constructor(
-    hub: IDeviceInterface,
+    hub: BaseHub,
     portId: number,
     modeMap: { [event: string]: number } = {},
     type: Consts.DeviceType = Consts.DeviceType.UNKNOWN

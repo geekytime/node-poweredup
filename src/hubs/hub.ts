@@ -3,9 +3,9 @@ import { compareVersions } from 'compare-versions'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { Device } from '../device.js'
+import { HubDevice } from '../hub-device.js'
 import { HubType } from '../hub-type.js'
-import { IBLEAbstraction } from '../interfaces.js'
+// import { IBLEAbstraction } from '../interfaces.js'
 import { DuploTrainBase } from './duplotrainbase.js'
 import { LPF2Hub } from './lpf2hub.js'
 import { Mario } from './mario.js'
@@ -20,7 +20,7 @@ const debug = Debug('hub')
 export class Hub extends LPF2Hub {
   protected _currentPort = 0x3b
 
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.HUB)
     debug('Discovered Powered UP Hub')
   }
@@ -40,7 +40,7 @@ export class Hub extends LPF2Hub {
   }
 
   public static async fromPeripheral(peripheral: Peripheral) {
-    const device = await Device.create(peripheral)
+    const device = await HubDevice.create(peripheral)
     if (HubType.IsWeDo2SmartHub(peripheral)) {
       return new WeDo2SmartHub(device)
     } else if (HubType.IsMoveHub(peripheral)) {

@@ -1,7 +1,7 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('duplotrainbase')
@@ -13,7 +13,7 @@ const debug = Debug('duplotrainbase')
  * @extends BaseHub
  */
 export class DuploTrainBase extends LPF2Hub {
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.DUPLO_TRAIN_BASE)
     debug('Discovered Duplo Train Base')
   }

@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { mapSpeed } from '../utils.js'
 import { BasicMotor } from './basicmotor.js'
 
@@ -14,7 +14,7 @@ export class TachoMotor extends BasicMotor {
   public useDecelerationProfile: boolean = true
 
   constructor(
-    hub: IDeviceInterface,
+    hub: BaseHub,
     portId: number,
     modeMap: { [event: string]: number } = {},
     type: Consts.DeviceType = Consts.DeviceType.UNKNOWN

@@ -2,7 +2,7 @@ import { compareVersions } from 'compare-versions'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('movehub')
@@ -14,7 +14,7 @@ const debug = Debug('movehub')
  * @extends BaseHub
  */
 export class MoveHub extends LPF2Hub {
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.MOVE_HUB)
     debug('Discovered Move Hub')
   }

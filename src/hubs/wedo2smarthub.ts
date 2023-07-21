@@ -1,23 +1,17 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { HubDevice } from '../hub-device.js'
 import { ServiceIds } from '../hub-type.js'
-import { IBLEAbstraction } from '../interfaces.js'
-import { isWebBluetooth } from '../utils.js'
 import { BaseHub } from './basehub.js'
 
 const debug = Debug('wedo2smarthub')
 
-/**
- * The WeDo2SmartHub is emitted if the discovered device is a WeDo 2.0 Smart Hub.
- * @class WeDo2SmartHub
- * @extends BaseHub
- */
 export class WeDo2SmartHub extends BaseHub {
   private _lastTiltX: number = 0
   private _lastTiltY: number = 0
 
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.WEDO2_SMART_HUB)
     debug('Discovered WeDo 2.0 Smart Hub')
   }
@@ -31,22 +25,12 @@ export class WeDo2SmartHub extends BaseHub {
     await this._bleDevice.discoverCharacteristicsForService(
       ServiceIds.WEDO2_SMART_HUB_2
     )
-    if (!isWebBluetooth) {
-      await this._bleDevice.discoverCharacteristicsForService(
-        ServiceIds.WEDO2_SMART_HUB_3
-      )
-      await this._bleDevice.discoverCharacteristicsForService(
-        ServiceIds.WEDO2_SMART_HUB_4
-      )
-      await this._bleDevice.discoverCharacteristicsForService(
-        ServiceIds.WEDO2_SMART_HUB_5
-      )
-    } else {
-      await this._bleDevice.discoverCharacteristicsForService('battery_service')
-      await this._bleDevice.discoverCharacteristicsForService(
-        'device_information'
-      )
-    }
+
+    await this._bleDevice.discoverCharacteristicsForService('battery_service')
+    await this._bleDevice.discoverCharacteristicsForService(
+      'device_information'
+    )
+
     debug('Connect completed')
     this.emit('connect', this)
     this.postConnectInit()
@@ -65,56 +49,32 @@ export class WeDo2SmartHub extends BaseHub {
       Consts.BLECharacteristic.WEDO2_BUTTON,
       this._parseSensorMessage.bind(this)
     )
-    if (!isWebBluetooth) {
-      this._bleDevice.subscribeToCharacteristic(
-        Consts.BLECharacteristic.WEDO2_BATTERY,
-        this._parseBatteryMessage.bind(this)
-      )
-      this._bleDevice.readFromCharacteristic(
-        Consts.BLECharacteristic.WEDO2_BATTERY,
-        (err, data) => {
-          if (data) {
-            this._parseBatteryMessage(data)
-          }
+
+    this._bleDevice.readFromCharacteristic(
+      '00002a19-0000-1000-8000-00805f9b34fb',
+      (err, data) => {
+        if (data) {
+          this._parseBatteryMessage(data)
         }
-      )
-    } else {
-      this._bleDevice.readFromCharacteristic(
-        '00002a19-0000-1000-8000-00805f9b34fb',
-        (err, data) => {
-          if (data) {
-            this._parseBatteryMessage(data)
-          }
-        }
-      )
-      this._bleDevice.subscribeToCharacteristic(
-        '00002a19-0000-1000-8000-00805f9b34fb',
-        this._parseHighCurrentAlert.bind(this)
-      )
-    }
+      }
+    )
+    this._bleDevice.subscribeToCharacteristic(
+      '00002a19-0000-1000-8000-00805f9b34fb',
+      this._parseHighCurrentAlert.bind(this)
+    )
+
     this._bleDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.WEDO2_HIGH_CURRENT_ALERT,
       this._parseHighCurrentAlert.bind(this)
     )
-    if (!isWebBluetooth) {
-      this._bleDevice.readFromCharacteristic(
-        Consts.BLECharacteristic.WEDO2_FIRMWARE_REVISION,
-        (err, data) => {
-          if (data) {
-            this._parseFirmwareRevisionString(data)
-          }
+    this._bleDevice.readFromCharacteristic(
+      '00002a26-0000-1000-8000-00805f9b34fb',
+      (err, data) => {
+        if (data) {
+          this._parseFirmwareRevisionString(data)
         }
-      )
-    } else {
-      this._bleDevice.readFromCharacteristic(
-        '00002a26-0000-1000-8000-00805f9b34fb',
-        (err, data) => {
-          if (data) {
-            this._parseFirmwareRevisionString(data)
-          }
-        }
-      )
-    }
+      }
+    )
   }
 
   /**

@@ -1,7 +1,7 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('hub')
@@ -15,7 +15,7 @@ const debug = Debug('hub')
 export class TechnicSmallHub extends LPF2Hub {
   protected _currentPort = 0x3b
 
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.TECHNIC_SMALL_HUB)
     debug('Discovered Spike Essential Hub')
   }

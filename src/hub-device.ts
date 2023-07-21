@@ -2,13 +2,13 @@ import { Characteristic, Peripheral, Service } from '@abandonware/noble'
 import Debug from 'debug'
 import { EventEmitter } from 'events'
 
-import { IBLEAbstraction } from './interfaces.js'
+// import { IBLEAbstraction } from './interfaces.js'
 import { waitFor } from './utils.js'
 const debug = Debug('device')
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected'
 
-export class BFPeripheral extends EventEmitter implements IBLEAbstraction {
+export class HubDevice extends EventEmitter {
   public readonly peripheral: Peripheral
 
   private _characteristics: { [uuid: string]: Characteristic } = {}
@@ -28,7 +28,7 @@ export class BFPeripheral extends EventEmitter implements IBLEAbstraction {
   }
 
   public static async create(peripheral: Peripheral) {
-    const device = new BFPeripheral(peripheral)
+    const device = new HubDevice(peripheral)
     // HACK: this allows LPF2.0 hubs to send a second advertisement packet
     // consisting of the hub name before we try to read it
     await device.hasName()

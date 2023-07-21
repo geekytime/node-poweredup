@@ -2,12 +2,6 @@ import { EventEmitter } from 'events'
 
 import { Device } from './devices/device.js'
 
-export const isWebBluetooth = !!(
-  typeof navigator !== 'undefined' &&
-  navigator &&
-  navigator.bluetooth
-)
-
 export const toHex = (value: number, length: number = 2) => {
   return value.toString(16).padStart(length, '0')
 }

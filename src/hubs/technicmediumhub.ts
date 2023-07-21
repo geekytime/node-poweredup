@@ -1,7 +1,7 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('technicmediumhub')
@@ -13,7 +13,7 @@ const debug = Debug('technicmediumhub')
  * @extends BaseHub
  */
 export class TechnicMediumHub extends LPF2Hub {
-  constructor(device: IBLEAbstraction) {
+  constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.TECHNIC_MEDIUM_HUB)
     debug('Discovered Control+ Hub')
   }

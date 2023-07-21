@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { AbsoluteMotor } from './absolutemotor.js'
 
 /**
@@ -7,7 +7,7 @@ import { AbsoluteMotor } from './absolutemotor.js'
  * @extends AbsoluteMotor
  */
 export class TechnicLargeLinearMotor extends AbsoluteMotor {
-  constructor(hub: IDeviceInterface, portId: number) {
+  constructor(hub: BaseHub, portId: number) {
     super(hub, portId, {}, Consts.DeviceType.TECHNIC_LARGE_LINEAR_MOTOR)
   }
 }

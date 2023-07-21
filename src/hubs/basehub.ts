@@ -36,7 +36,8 @@ import { TechnicXLargeLinearMotor } from '../devices/technicxlargelinearmotor.js
 import { TiltSensor } from '../devices/tiltsensor.js'
 import { TrainMotor } from '../devices/trainmotor.js'
 import { VoltageSensor } from '../devices/voltagesensor.js'
-import { IBLEAbstraction } from '../interfaces.js'
+import { HubDevice } from '../hub-device.js'
+// import { IBLEAbstraction } from '../interfaces.js'
 
 const debug = Debug('basehub')
 
@@ -52,13 +53,13 @@ export class BaseHub extends EventEmitter {
   protected _portMap: { [portName: string]: number } = {}
   protected _virtualPorts: number[] = []
 
-  protected _bleDevice: IBLEAbstraction
+  protected _bleDevice: HubDevice
 
   private _type: Consts.HubType
   private _attachCallbacks: ((device: Device) => boolean)[] = []
 
   constructor(
-    bleDevice: IBLEAbstraction,
+    bleDevice: HubDevice,
     portMap: { [portName: string]: number } = {},
     type: Consts.HubType = Consts.HubType.UNKNOWN
   ) {

@@ -43,7 +43,6 @@ import { RemoteControl } from './hubs/remotecontrol.js'
 import { TechnicMediumHub } from './hubs/technicmediumhub.js'
 import { WeDo2SmartHub } from './hubs/wedo2smarthub.js'
 import { Scanner } from './scanner.js'
-import { isWebBluetooth } from './utils.js'
 
 export {
   Scanner,
@@ -90,6 +89,5 @@ export {
   CurrentSensor,
   TachoMotor,
   AbsoluteMotor,
-  BasicMotor,
-  isWebBluetooth
+  BasicMotor
 }

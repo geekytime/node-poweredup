@@ -1,11 +1,11 @@
 import * as Consts from '../consts.js'
-import { IDeviceInterface } from '../interfaces.js'
+import { BaseHub } from '../hubs/basehub.js'
 import { mapSpeed, normalizeAngle } from '../utils.js'
 import { TachoMotor } from './tachomotor.js'
 
 export class AbsoluteMotor extends TachoMotor {
   constructor(
-    hub: IDeviceInterface,
+    hub: BaseHub,
     portId: number,
     modeMap: { [event: string]: number } = {},
     type: Consts.DeviceType = Consts.DeviceType.UNKNOWN
