@@ -42,12 +42,11 @@ import { MoveHub } from './hubs/movehub.js'
 import { RemoteControl } from './hubs/remotecontrol.js'
 import { TechnicMediumHub } from './hubs/technicmediumhub.js'
 import { WeDo2SmartHub } from './hubs/wedo2smarthub.js'
-import { PoweredUP } from './poweredup-node.js'
+import { Scanner } from './scanner.js'
 import { isWebBluetooth } from './utils.js'
 
-export default PoweredUP
 export {
-  PoweredUP,
+  Scanner,
   BaseHub,
   WeDo2SmartHub,
   TechnicMediumHub,

@@ -1,6 +1,6 @@
 {
-  "name": "node-poweredup",
-  "version": "8.0.5",
+  "name": "brick-fu",
+  "version": "1.0.0",
   "description": "A Javascript module to interface with LEGO Powered Up components.",
   "homepage": "https://github.com/geekytime/node-poweredup/",
   "main": "dist/node/index-node.js",
@@ -22,8 +22,8 @@
     "prepublishOnly": "pnpm run lint && pnpm run build:node"
   },
   "author": [
-    "Nathan Kellenicki <nathan@kellenicki.com>",
-    "Chris Jaynes <chris@jaynes.me>"
+    "Chris Jaynes <chris@jaynes.me>",
+    "Nathan Kellenicki <nathan@kellenicki.com>"
   ],
   "license": "MIT",
   "dependencies": {

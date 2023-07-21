@@ -1,7 +1,8 @@
-import { PoweredUP } from '../dist/node/index-node.js'
-const poweredUP = new PoweredUP()
+import { Scanner } from '../dist/node/index-node.js'
 
-poweredUP.on('discover', async (hub) => {
+const scanner = new Scanner()
+
+scanner.on('discover', async (hub) => {
   // Wait to discover a Hub
   console.log(`Discovered ${hub.name}!`)
   await hub.connect() // Connect to the Hub
@@ -24,5 +25,5 @@ poweredUP.on('discover', async (hub) => {
   await hub.sleep(1000) // Do nothing for 1 second
 })
 
-poweredUP.scan() // Start scanning for Hubs
+scanner.scan() // Start scanning for Hubs
 console.log('Scanning for Hubs...')

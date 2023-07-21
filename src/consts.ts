@@ -189,25 +189,6 @@ export enum DuploTrainBaseSound {
   STEAM = 10
 }
 
-export enum BLEManufacturerData {
-  DUPLO_TRAIN_BASE_ID = 32,
-  MOVE_HUB_ID = 64,
-  HUB_ID = 65,
-  REMOTE_CONTROL_ID = 66,
-  MARIO_ID = 67,
-  TECHNIC_MEDIUM_HUB_ID = 128,
-  TECHNIC_SMALL_HUB_ID = 131
-}
-
-export enum BLEService {
-  WEDO2_SMART_HUB = '00001523-1212-efde-1523-785feabcd123',
-  WEDO2_SMART_HUB_2 = '00004f0e-1212-efde-1523-785feabcd123',
-  WEDO2_SMART_HUB_3 = '2a19',
-  WEDO2_SMART_HUB_4 = '180f',
-  WEDO2_SMART_HUB_5 = '180a',
-  LPF2_HUB = '00001623-1212-efde-1623-785feabcd123'
-}
-
 export enum BLECharacteristic {
   WEDO2_BATTERY = '2a19',
   WEDO2_FIRMWARE_REVISION = '2a26',
