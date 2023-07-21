@@ -1,10 +1,18 @@
-import { Peripheral } from '@abandonware/noble'
 import { compareVersions } from 'compare-versions'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { Device } from '../device.js'
+import { HubType } from '../hub-type.js'
 import { IBLEAbstraction } from '../interfaces.js'
+import { DuploTrainBase } from './duplotrainbase.js'
 import { LPF2Hub } from './lpf2hub.js'
+import { Mario } from './mario.js'
+import { MoveHub } from './movehub.js'
+import { RemoteControl } from './remotecontrol.js'
+import { TechnicMediumHub } from './technicmediumhub.js'
+import { TechnicSmallHub } from './technicsmallhub.js'
+import { WeDo2SmartHub } from './wedo2smarthub.js'
 
 const debug = Debug('hub')
 
@@ -15,20 +23,6 @@ const debug = Debug('hub')
  * @extends BaseHub
  */
 export class Hub extends LPF2Hub {
-  public static IsHub(peripheral: Peripheral) {
-    return (
-      peripheral.advertisement &&
-      peripheral.advertisement.serviceUuids &&
-      peripheral.advertisement.serviceUuids.indexOf(
-        Consts.BLEService.LPF2_HUB.replace(/-/g, '')
-      ) >= 0 &&
-      peripheral.advertisement.manufacturerData &&
-      peripheral.advertisement.manufacturerData.length > 3 &&
-      peripheral.advertisement.manufacturerData[3] ===
-        Consts.BLEManufacturerData.HUB_ID
-    )
-  }
-
   protected _currentPort = 0x3b
 
   constructor(device: IBLEAbstraction) {
@@ -46,6 +40,30 @@ export class Hub extends LPF2Hub {
     if (compareVersions('1.1.00.0004', version) === 1) {
       throw new Error(
         `Your Powered Up Hub's (${this.name}) firmware is out of date and unsupported by this library. Please update it via the official Powered Up app.`
+      )
+    }
+  }
+
+  public static fromDevice(device: Device) {
+    if (HubType.IsWeDo2SmartHub(device.peripheral)) {
+      return new WeDo2SmartHub(device)
+    } else if (HubType.IsMoveHub(device.peripheral)) {
+      return new MoveHub(device)
+    } else if (HubType.IsHub(device.peripheral)) {
+      return new Hub(device)
+    } else if (HubType.IsRemoteControl(device.peripheral)) {
+      return new RemoteControl(device)
+    } else if (HubType.IsDuploTrainBase(device.peripheral)) {
+      return new DuploTrainBase(device)
+    } else if (HubType.IsTechnicSmallHub(device.peripheral)) {
+      return new TechnicSmallHub(device)
+    } else if (HubType.IsTechnicMediumHub(device.peripheral)) {
+      return new TechnicMediumHub(device)
+    } else if (HubType.IsMario(device.peripheral)) {
+      return new Mario(device)
+    } else {
+      throw new Error(
+        `Unknown device/peripheral type: ${device.peripheral.uuid}`
       )
     }
   }

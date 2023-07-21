@@ -3,10 +3,10 @@ import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 import { IBLEAbstraction } from './interfaces.js'
-const debug = Debug('bledevice')
+const debug = Debug('device')
 
-export class NobleDevice extends EventEmitter implements IBLEAbstraction {
-  private _noblePeripheral: Peripheral
+export class Device extends EventEmitter implements IBLEAbstraction {
+  public readonly peripheral: Peripheral
 
   private _uuid: string
   private _name: string = ''
@@ -18,18 +18,18 @@ export class NobleDevice extends EventEmitter implements IBLEAbstraction {
   private _connected: boolean = false
   private _connecting: boolean = false
 
-  constructor(device: Peripheral) {
+  constructor(peripheral: Peripheral) {
     super()
-    this._noblePeripheral = device
-    this._uuid = device.uuid
-    device.on('disconnect', () => {
+    this.peripheral = peripheral
+    this._uuid = peripheral.uuid
+    peripheral.on('disconnect', () => {
       this._connecting = false
       this._connected = false
       this.emit('disconnect')
     })
     // NK: This hack allows LPF2.0 hubs to send a second advertisement packet consisting of the hub name before we try to read it
     setTimeout(() => {
-      this._name = device.advertisement.localName
+      this._name = peripheral.advertisement.localName
       this.emit('discoverComplete')
     }, 1000)
   }
@@ -53,7 +53,7 @@ export class NobleDevice extends EventEmitter implements IBLEAbstraction {
   public connect() {
     return new Promise<void>((resolve, reject) => {
       this._connecting = true
-      this._noblePeripheral.connect((err: string) => {
+      this.peripheral.connect((err: string) => {
         if (err) {
           return reject(err)
         }
@@ -67,7 +67,7 @@ export class NobleDevice extends EventEmitter implements IBLEAbstraction {
 
   public disconnect() {
     return new Promise<void>((resolve) => {
-      this._noblePeripheral.disconnect()
+      this.peripheral.disconnect()
       this._connecting = false
       this._connected = false
       return resolve()
@@ -76,7 +76,7 @@ export class NobleDevice extends EventEmitter implements IBLEAbstraction {
 
   public discoverServices(uuid: string) {
     return new Promise<Service[]>((resolve, reject) => {
-      this._noblePeripheral.discoverServices(
+      this.peripheral.discoverServices(
         [uuid],
         (errorMessage: string | undefined, services: Service[]) => {
           if (errorMessage) {

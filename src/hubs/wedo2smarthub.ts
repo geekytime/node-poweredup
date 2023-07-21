@@ -1,7 +1,7 @@
-import { Peripheral } from '@abandonware/noble'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { ServiceIds } from '../hub-type.js'
 import { IBLEAbstraction } from '../interfaces.js'
 import { isWebBluetooth } from '../utils.js'
 import { BaseHub } from './basehub.js'
@@ -14,16 +14,6 @@ const debug = Debug('wedo2smarthub')
  * @extends BaseHub
  */
 export class WeDo2SmartHub extends BaseHub {
-  public static IsWeDo2SmartHub(peripheral: Peripheral) {
-    return (
-      peripheral.advertisement &&
-      peripheral.advertisement.serviceUuids &&
-      peripheral.advertisement.serviceUuids.indexOf(
-        Consts.BLEService.WEDO2_SMART_HUB.replace(/-/g, '')
-      ) >= 0
-    )
-  }
-
   private _lastTiltX: number = 0
   private _lastTiltY: number = 0
 
@@ -36,20 +26,20 @@ export class WeDo2SmartHub extends BaseHub {
     debug('Connecting to WeDo 2.0 Smart Hub')
     await super.connect()
     await this._bleDevice.discoverCharacteristicsForService(
-      Consts.BLEService.WEDO2_SMART_HUB
+      ServiceIds.WEDO2_SMART_HUB
     )
     await this._bleDevice.discoverCharacteristicsForService(
-      Consts.BLEService.WEDO2_SMART_HUB_2
+      ServiceIds.WEDO2_SMART_HUB_2
     )
     if (!isWebBluetooth) {
       await this._bleDevice.discoverCharacteristicsForService(
-        Consts.BLEService.WEDO2_SMART_HUB_3
+        ServiceIds.WEDO2_SMART_HUB_3
       )
       await this._bleDevice.discoverCharacteristicsForService(
-        Consts.BLEService.WEDO2_SMART_HUB_4
+        ServiceIds.WEDO2_SMART_HUB_4
       )
       await this._bleDevice.discoverCharacteristicsForService(
-        Consts.BLEService.WEDO2_SMART_HUB_5
+        ServiceIds.WEDO2_SMART_HUB_5
       )
     } else {
       await this._bleDevice.discoverCharacteristicsForService('battery_service')

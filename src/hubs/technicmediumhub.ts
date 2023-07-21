@@ -1,4 +1,3 @@
-import { Peripheral } from '@abandonware/noble'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
@@ -14,20 +13,6 @@ const debug = Debug('technicmediumhub')
  * @extends BaseHub
  */
 export class TechnicMediumHub extends LPF2Hub {
-  public static IsTechnicMediumHub(peripheral: Peripheral) {
-    return (
-      peripheral.advertisement &&
-      peripheral.advertisement.serviceUuids &&
-      peripheral.advertisement.serviceUuids.indexOf(
-        Consts.BLEService.LPF2_HUB.replace(/-/g, '')
-      ) >= 0 &&
-      peripheral.advertisement.manufacturerData &&
-      peripheral.advertisement.manufacturerData.length > 3 &&
-      peripheral.advertisement.manufacturerData[3] ===
-        Consts.BLEManufacturerData.TECHNIC_MEDIUM_HUB_ID
-    )
-  }
-
   constructor(device: IBLEAbstraction) {
     super(device, PortMap, Consts.HubType.TECHNIC_MEDIUM_HUB)
     debug('Discovered Control+ Hub')

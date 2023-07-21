@@ -4,9 +4,9 @@
  *
  */
 
-import PoweredUP from '..'
+import { PoweredUP } from '../dist/node/index-node.js'
 
-const poweredUP = new PoweredUP.PoweredUP()
+const poweredUP = new PoweredUP()
 poweredUP.scan()
 
 console.log('Looking for Powered UP Hubs...')

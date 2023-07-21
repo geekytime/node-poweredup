@@ -1,4 +1,3 @@
-import { Peripheral } from '@abandonware/noble'
 import { compareVersions } from 'compare-versions'
 import Debug from 'debug'
 
@@ -15,20 +14,6 @@ const debug = Debug('movehub')
  * @extends BaseHub
  */
 export class MoveHub extends LPF2Hub {
-  public static IsMoveHub(peripheral: Peripheral) {
-    return (
-      peripheral.advertisement &&
-      peripheral.advertisement.serviceUuids &&
-      peripheral.advertisement.serviceUuids.indexOf(
-        Consts.BLEService.LPF2_HUB.replace(/-/g, '')
-      ) >= 0 &&
-      peripheral.advertisement.manufacturerData &&
-      peripheral.advertisement.manufacturerData.length > 3 &&
-      peripheral.advertisement.manufacturerData[3] ===
-        Consts.BLEManufacturerData.MOVE_HUB_ID
-    )
-  }
-
   constructor(device: IBLEAbstraction) {
     super(device, PortMap, Consts.HubType.MOVE_HUB)
     debug('Discovered Move Hub')

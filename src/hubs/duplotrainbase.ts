@@ -1,4 +1,3 @@
-import { Peripheral } from '@abandonware/noble'
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
@@ -14,20 +13,6 @@ const debug = Debug('duplotrainbase')
  * @extends BaseHub
  */
 export class DuploTrainBase extends LPF2Hub {
-  public static IsDuploTrainBase(peripheral: Peripheral) {
-    return (
-      peripheral.advertisement &&
-      peripheral.advertisement.serviceUuids &&
-      peripheral.advertisement.serviceUuids.indexOf(
-        Consts.BLEService.LPF2_HUB.replace(/-/g, '')
-      ) >= 0 &&
-      peripheral.advertisement.manufacturerData &&
-      peripheral.advertisement.manufacturerData.length > 3 &&
-      peripheral.advertisement.manufacturerData[3] ===
-        Consts.BLEManufacturerData.DUPLO_TRAIN_BASE_ID
-    )
-  }
-
   constructor(device: IBLEAbstraction) {
     super(device, PortMap, Consts.HubType.DUPLO_TRAIN_BASE)
     debug('Discovered Duplo Train Base')
