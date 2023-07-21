@@ -7,6 +7,7 @@ import { Device } from './device.js'
 import { ServiceIds } from './hub-type.js'
 import { BaseHub } from './hubs/basehub.js'
 import { Hub } from './hubs/hub.js'
+import { waitFor } from './utils.js'
 
 const debug = Debug('scanner')
 
@@ -22,36 +23,30 @@ export type ScannerState =
 export class Scanner extends EventEmitter {
   private _connectedHubs = new Map<string, BaseHub>()
 
-  private ready = false
-  private wantScan = false
-
   constructor() {
     super()
     noble.on('discover', this.handleDiscovery)
-    noble.on('stateChange', this.handleNobleStateChange)
-    noble.on('scanStop', this.handleNobleStopScan)
   }
 
-  private handleNobleStateChange = (nobleState: string) => {
-    this.ready = nobleState === 'poweredOn'
-
-    if (this.ready) {
-      if (this.wantScan) {
-        debug('Scanning started')
-        this.nobleStartScanning()
-      } else {
-        noble.stopScanning()
-      }
-    }
+  public static async create() {
+    await Scanner.nobleInit()
+    return new Scanner()
   }
 
-  private handleNobleStopScan = () => {
-    setTimeout(() => {
-      this.nobleStartScanning()
-    }, 1000)
+  private static nobleInit = async () => {
+    await waitFor({
+      timeoutMS: 10000,
+      retryMS: 50,
+      checkFn: Scanner.nobleIsPoweredOn
+    })
+  }
+
+  private static nobleIsPoweredOn = async () => {
+    return noble.state === 'poweredOn'
   }
 
   private nobleStartScanning = () => {
+    debug('nobleStartScanning')
     noble.startScanningAsync([
       ServiceIds.LPF2_HUB,
       ServiceIds.LPF2_HUB.replace(/-/g, ''),
@@ -61,18 +56,28 @@ export class Scanner extends EventEmitter {
   }
 
   public async scan() {
-    this.wantScan = true
-
-    if (this.ready) {
-      debug('Scanning started')
-      this.nobleStartScanning()
-    }
-
+    debug('scan')
+    this.nobleStartScanning()
     return true
   }
 
+  public connectToHub(): Promise<Hub> {
+    debug('connectToHub')
+    return new Promise((resolve, reject) => {
+      this.once('discover', async (hub: Hub) => {
+        try {
+          debug(`hub discovered: ${hub.name}`)
+          await hub.connect()
+          resolve(hub)
+        } catch (error) {
+          reject(error)
+        }
+      })
+      this.scan()
+    })
+  }
+
   public stop() {
-    this.wantScan = false
     noble.removeListener('discover', this.handleDiscovery)
     noble.stopScanning()
   }
@@ -117,9 +122,7 @@ export class Scanner extends EventEmitter {
         debug(`Hub ${hub.uuid} disconnected`)
         delete this._connectedHubs[hub.uuid]
 
-        if (this.wantScan) {
-          this.nobleStartScanning()
-        }
+        this.nobleStartScanning()
       })
 
       debug(`Hub ${hub.uuid} discovered`)

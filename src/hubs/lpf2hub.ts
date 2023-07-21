@@ -1,6 +1,7 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { ServiceIds } from '../hub-type.js'
 import { decodeMACAddress, decodeVersion, toBin, toHex } from '../utils.js'
 import { BaseHub } from './basehub.js'
 
@@ -21,9 +22,7 @@ export class LPF2Hub extends BaseHub {
   public async connect() {
     debug('LPF2Hub connecting')
     await super.connect()
-    await this._bleDevice.discoverCharacteristicsForService(
-      Consts.BLEService.LPF2_HUB
-    )
+    await this._bleDevice.discoverCharacteristicsForService(ServiceIds.LPF2_HUB)
     this._bleDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.LPF2_ALL,
       this._parseMessage.bind(this)

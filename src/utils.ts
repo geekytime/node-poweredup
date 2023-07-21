@@ -108,3 +108,37 @@ export const parseColor = (color: number) => {
   }
   return color
 }
+
+export const sleep = (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
+
+export const nsPerMs = 1000000
+
+export const waitFor = async ({
+  timeoutMS,
+  retryMS,
+  checkFn,
+  elapsed = 0
+}: {
+  timeoutMS: number
+  retryMS: number
+  checkFn: () => Promise<boolean>
+  elapsed?: number
+}) => {
+  const start = process.hrtime.bigint()
+  const result = await checkFn()
+  const end = process.hrtime.bigint()
+  elapsed += Number(end - start) / nsPerMs
+
+  if (result) {
+    return
+  }
+  if (elapsed > timeoutMS) {
+    throw new Error('waitFor timed out after ${elapsed}ms')
+  }
+  await sleep(retryMS)
+  return waitFor({ timeoutMS, retryMS, checkFn, elapsed })
+}

@@ -2,6 +2,7 @@ import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 import * as Consts from './consts.js'
+import { ManufacturerDataIds, ServiceIds } from './hub-type.js'
 import { BaseHub } from './hubs/basehub.js'
 import { DuploTrainBase } from './hubs/duplotrainbase.js'
 import { Hub } from './hubs/hub.js'
@@ -37,14 +38,14 @@ export class PoweredUP extends EventEmitter {
       const device = await navigator.bluetooth.requestDevice({
         filters: [
           {
-            services: [Consts.BLEService.WEDO2_SMART_HUB]
+            services: [ServiceIds.WEDO2_SMART_HUB]
           },
           {
-            services: [Consts.BLEService.LPF2_HUB]
+            services: [ServiceIds.LPF2_HUB]
           }
         ],
         optionalServices: [
-          Consts.BLEService.WEDO2_SMART_HUB_2,
+          ServiceIds.WEDO2_SMART_HUB_2,
           'battery_service',
           'device_information'
         ]
@@ -126,22 +127,22 @@ export class PoweredUP extends EventEmitter {
             buf = buf.slice(len)
             if (message[2] === 0x01 && message[3] === 0x0b) {
               switch (message[5]) {
-                case Consts.BLEManufacturerData.REMOTE_CONTROL_ID:
+                case ManufacturerDataIds.REMOTE_CONTROL_ID:
                   resolve(Consts.HubType.REMOTE_CONTROL)
                   break
-                case Consts.BLEManufacturerData.MOVE_HUB_ID:
+                case ManufacturerDataIds.MOVE_HUB_ID:
                   resolve(Consts.HubType.MOVE_HUB)
                   break
-                case Consts.BLEManufacturerData.HUB_ID:
+                case ManufacturerDataIds.HUB_ID:
                   resolve(Consts.HubType.HUB)
                   break
-                case Consts.BLEManufacturerData.DUPLO_TRAIN_BASE_ID:
+                case ManufacturerDataIds.DUPLO_TRAIN_BASE_ID:
                   resolve(Consts.HubType.DUPLO_TRAIN_BASE)
                   break
-                case Consts.BLEManufacturerData.TECHNIC_SMALL_HUB_ID:
+                case ManufacturerDataIds.TECHNIC_SMALL_HUB_ID:
                   resolve(Consts.HubType.TECHNIC_SMALL_HUB)
                   break
-                case Consts.BLEManufacturerData.TECHNIC_MEDIUM_HUB_ID:
+                case ManufacturerDataIds.TECHNIC_MEDIUM_HUB_ID:
                   resolve(Consts.HubType.TECHNIC_MEDIUM_HUB)
                   break
               }
@@ -171,9 +172,7 @@ export class PoweredUP extends EventEmitter {
     let hubType = Consts.HubType.UNKNOWN
     let isLPF2Hub = false
     try {
-      await device.discoverCharacteristicsForService(
-        Consts.BLEService.WEDO2_SMART_HUB
-      )
+      await device.discoverCharacteristicsForService(ServiceIds.WEDO2_SMART_HUB)
       hubType = Consts.HubType.WEDO2_SMART_HUB
     } catch (error) {
       console.warn(
@@ -183,9 +182,7 @@ export class PoweredUP extends EventEmitter {
     }
     try {
       if (hubType !== Consts.HubType.WEDO2_SMART_HUB) {
-        await device.discoverCharacteristicsForService(
-          Consts.BLEService.LPF2_HUB
-        )
+        await device.discoverCharacteristicsForService(ServiceIds.LPF2_HUB)
         isLPF2Hub = true
       }
     } catch (error) {

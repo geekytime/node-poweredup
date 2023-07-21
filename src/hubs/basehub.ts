@@ -40,10 +40,6 @@ import { IBLEAbstraction } from '../interfaces.js'
 
 const debug = Debug('basehub')
 
-/**
- * @class BaseHub
- * @extends EventEmitter
- */
 export class BaseHub extends EventEmitter {
   protected _attachedDevices: { [portId: number]: Device } = {}
 
@@ -72,107 +68,54 @@ export class BaseHub extends EventEmitter {
     this._bleDevice = bleDevice
     this._portMap = Object.assign({}, portMap)
     bleDevice.on('disconnect', () => {
-      /**
-       * Emits when the hub is disconnected.
-       * @event Hub#disconnect
-       */
       this.emit('disconnect')
     })
   }
 
-  /**
-   * @readonly
-   * @property {string} name Name of the hub
-   */
   public get name() {
     return this._bleDevice.name
   }
 
-  /**
-   * @readonly
-   * @property {string} connected Connected status
-   */
   public get connected() {
     return this._bleDevice.connected
   }
 
-  /**
-   * @readonly
-   * @property {string} connecting Connecting status
-   */
   public get connecting() {
     return this._bleDevice.connecting
   }
 
-  /**
-   * @readonly
-   * @property {string} type Hub type
-   */
   public get type() {
     return this._type
   }
 
-  /**
-   * @readonly
-   * @property {string[]} ports Array of port names
-   */
   public get ports() {
     return Object.keys(this._portMap)
   }
 
-  /**
-   * @readonly
-   * @property {string} firmwareVersion Firmware version of the hub
-   */
   public get firmwareVersion() {
     return this._firmwareVersion
   }
 
-  /**
-   * @readonly
-   * @property {string} hardwareVersion Hardware version of the hub
-   */
   public get hardwareVersion() {
     return this._hardwareVersion
   }
 
-  /**
-   * @readonly
-   * @property {string} primaryMACAddress Primary MAC address of the hub
-   */
   public get primaryMACAddress() {
     return this._primaryMACAddress
   }
 
-  /**
-   * @readonly
-   * @property {string} uuid UUID of the hub
-   */
   public get uuid() {
     return this._bleDevice.uuid
   }
 
-  /**
-   * @readonly
-   * @property {number} batteryLevel Battery level of the hub (Percentage between 0-100)
-   */
   public get batteryLevel() {
     return this._batteryLevel
   }
 
-  /**
-   * @readonly
-   * @property {number} rssi Signal strength of the hub
-   */
   public get rssi() {
     return this._rssi
   }
 
-  /**
-   * Connect to the Hub.
-   * @method Hub#connect
-   * @returns {Promise} Resolved upon successful connect.
-   */
   public async connect() {
     if (this._bleDevice.connecting) {
       throw new Error('Already connecting')
@@ -182,21 +125,10 @@ export class BaseHub extends EventEmitter {
     return this._bleDevice.connect()
   }
 
-  /**
-   * Disconnect the Hub.
-   * @method Hub#disconnect
-   * @returns {Promise} Resolved upon successful disconnect.
-   */
   public disconnect() {
     return this._bleDevice.disconnect()
   }
 
-  /**
-   * Retrieves the device attached to a given port.
-   * @method Hub#getDeviceAtPort
-   * @param {string} portName The name of the port to retrieve the device from.
-   * @returns {Device | undefined} The device attached to the port.
-   */
   public getDeviceAtPort(portName: string) {
     const portId = this._portMap[portName]
     if (portId !== undefined) {
@@ -206,14 +138,6 @@ export class BaseHub extends EventEmitter {
     }
   }
 
-  /**
-   * Retrieves the device attached to a given port, waiting until one is attached if there isn't one.
-   *
-   * Note: If a device is never attached, the returned promise may never resolve.
-   * @method Hub#waitForDeviceAtPort
-   * @param {string} portName The name of the port to retrieve the device from.
-   * @returns {Promise} Resolved once a device is attached, or resolved immediately if a device is already attached.
-   */
   public waitForDeviceAtPort(portName: string) {
     return new Promise((resolve) => {
       const existingDevice = this.getDeviceAtPort(portName)
@@ -231,33 +155,14 @@ export class BaseHub extends EventEmitter {
     })
   }
 
-  /**
-   * Retrieves all attached devices.
-   * @method Hub#getDevices
-   * @returns {Device[]} Array of all attached devices.
-   */
   public getDevices() {
     return Object.values(this._attachedDevices)
   }
 
-  /**
-   * Retrieves an array of devices of the specified type.
-   * @method Hub#getDevicesByType
-   * @param {number} deviceType The device type to lookup.
-   * @returns {Device[]} Array of all devices of the specified type.
-   */
   public getDevicesByType(deviceType: number) {
     return this.getDevices().filter((device) => device.type === deviceType)
   }
 
-  /**
-   * Retrieves the first device attached of the specified type, waiting until one is attached if there isn't one.
-   *
-   * Note: If a device is never attached, the returned promise may never resolve.
-   * @method Hub#waitForDeviceByType
-   * @param {number} deviceType The device type to lookup.
-   * @returns {Promise} Resolved once a device is attached, or resolved immediately if a device is already attached.
-   */
   public waitForDeviceByType(deviceType: number) {
     return new Promise((resolve) => {
       const existingDevices = this.getDevicesByType(deviceType)
@@ -288,28 +193,12 @@ export class BaseHub extends EventEmitter {
     return this._virtualPorts.indexOf(portId) > -1
   }
 
-  /**
-   * Sleep a given amount of time.
-   *
-   * Note: This is a helper method to make it easier to add delays into a chain of commands.
-   * @method Hub#sleep
-   * @param {number} delay How long to sleep (in milliseconds).
-   * @returns {Promise} Resolved after the delay is finished.
-   */
   public sleep(delay: number) {
     return new Promise<void>((resolve) => {
       global.setTimeout(resolve, delay)
     })
   }
 
-  /**
-   * Wait until a given list of concurrently running commands are complete.
-   *
-   * Note: This is a helper method to make it easier to wait for concurrent commands to complete.
-   * @method Hub#wait
-   * @param {Array<Promise<any>>} commands Array of executing commands.
-   * @returns {Promise} Resolved after the commands are finished.
-   */
   public wait(commands: Promise<unknown>[]) {
     return Promise.all(commands)
   }
@@ -353,11 +242,6 @@ export class BaseHub extends EventEmitter {
     }
     this._attachedDevices[device.portId] = device
 
-    /**
-     * Emits when a device is attached to the Hub.
-     * @event Hub#attach
-     * @param {Device} device
-     */
     this.emit('attach', device)
     debug(
       `Attached device type ${device.type} (${
@@ -376,11 +260,7 @@ export class BaseHub extends EventEmitter {
 
   protected _detachDevice(device: Device) {
     delete this._attachedDevices[device.portId]
-    /**
-     * Emits when a device is detached from the Hub.
-     * @event Hub#detach
-     * @param {Device} device
-     */
+
     this.emit('detach', device)
     debug(
       `Detached device type ${device.type} (${

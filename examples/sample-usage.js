@@ -1,11 +1,10 @@
 import { Scanner } from '../dist/node/index-node.js'
 
-const scanner = new Scanner()
+const run = async () => {
+  const scanner = await Scanner.create()
 
-scanner.on('discover', async (hub) => {
-  // Wait to discover a Hub
-  console.log(`Discovered ${hub.name}!`)
-  await hub.connect() // Connect to the Hub
+  const hub = await scanner.connectToHub()
+  console.log(`Connected to ${hub.name}!`)
   const motorA = await hub.waitForDeviceAtPort('A') // Make sure a motor is plugged into port A
   const motorB = await hub.waitForDeviceAtPort('B') // Make sure a motor is plugged into port B
   console.log('Connected')
@@ -23,7 +22,13 @@ scanner.on('discover', async (hub) => {
   await hub.sleep(2000)
   motorA.brake()
   await hub.sleep(1000) // Do nothing for 1 second
-})
+}
 
-scanner.scan() // Start scanning for Hubs
-console.log('Scanning for Hubs...')
+run().then(
+  () => {
+    console.log('Scanning for Hubs...')
+  },
+  (error) => {
+    console.error(error)
+  }
+)
