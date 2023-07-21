@@ -3,10 +3,6 @@ import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp, mapSpeed } from '../utils.js'
 import { Device } from './device.js'
 
-/**
- * @class BasicMotor
- * @extends Device
- */
 export class BasicMotor extends Device {
   constructor(
     hub: BaseHub,

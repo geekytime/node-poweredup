@@ -3,10 +3,6 @@ import { BaseHub } from '../hubs/basehub.js'
 import { parseColor } from '../utils.js'
 import { Device } from './device.js'
 
-/**
- * @class DuploTrainBaseColorSensor
- * @extends Device
- */
 export class DuploTrainBaseColorSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
     super(hub, portId, ModeMap, Consts.DeviceType.DUPLO_TRAIN_BASE_COLOR_SENSOR)

@@ -6,12 +6,6 @@ import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('technicmediumhub')
 
-/**
- * The TechnicMediumHub is emitted if the discovered device is a Technic Medium Hub.
- * @class TechnicMediumHub
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class TechnicMediumHub extends LPF2Hub {
   constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.TECHNIC_MEDIUM_HUB)

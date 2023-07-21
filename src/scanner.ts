@@ -6,7 +6,7 @@ import { EventEmitter } from 'events'
 import { ServiceIds } from './hub-type.js'
 import { BaseHub } from './hubs/basehub.js'
 import { Hub } from './hubs/hub.js'
-import { waitFor } from './utils.js'
+import { sanitizeUUID, waitFor } from './utils.js'
 
 const debug = Debug('scanner')
 
@@ -48,9 +48,9 @@ export class Scanner extends EventEmitter {
     debug('nobleStartScanning')
     noble.startScanningAsync([
       ServiceIds.LPF2_HUB,
-      ServiceIds.LPF2_HUB.replace(/-/g, ''),
+      sanitizeUUID(ServiceIds.LPF2_HUB),
       ServiceIds.WEDO2_SMART_HUB,
-      ServiceIds.WEDO2_SMART_HUB.replace(/-/g, '')
+      sanitizeUUID(ServiceIds.WEDO2_SMART_HUB)
     ])
   }
 

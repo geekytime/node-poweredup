@@ -2,12 +2,7 @@ import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
 import { BaseHub } from '../hubs/basehub.js'
-// import { BaseHub } from '../hubs/basehub.js'
 
-/**
- * @class Device
- * @extends EventEmitter
- */
 export class Device extends EventEmitter {
   public autoSubscribe: boolean = true
   public values: Record<string, unknown> = {}

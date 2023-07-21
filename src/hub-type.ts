@@ -1,5 +1,7 @@
 import { Peripheral } from '@abandonware/noble'
 
+import { sanitizeUUID } from './utils.js'
+
 export const ServiceIds = {
   WEDO2_SMART_HUB: '00001523-1212-efde-1523-785feabcd123',
   WEDO2_SMART_HUB_2: '00004f0e-1212-efde-1523-785feabcd123',
@@ -29,7 +31,7 @@ export class HubType {
     peripheral: Peripheral
     serviceName: keyof typeof ServiceIds
   }) {
-    const serviceId: string = ServiceIds[serviceName].replace(/-/g, '')
+    const serviceId: string = sanitizeUUID(ServiceIds[serviceName])
     const serviceUuids = peripheral?.advertisement?.serviceUuids || []
     return serviceUuids.includes(serviceId)
   }

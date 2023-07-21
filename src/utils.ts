@@ -96,6 +96,10 @@ export const calculateRamp = (
   return emitter
 }
 
+export const sanitizeUUID = (uuid: string) => {
+  return uuid.replace(/-/g, '')
+}
+
 export const parseColor = (color: number) => {
   if (color === 1 || color === 5) {
     color = color + 1

@@ -37,7 +37,6 @@ import { TiltSensor } from '../devices/tiltsensor.js'
 import { TrainMotor } from '../devices/trainmotor.js'
 import { VoltageSensor } from '../devices/voltagesensor.js'
 import { HubDevice } from '../hub-device.js'
-// import { IBLEAbstraction } from '../interfaces.js'
 
 const debug = Debug('basehub')
 

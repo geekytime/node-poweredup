@@ -3,7 +3,7 @@ import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 // import { IBLEAbstraction } from './interfaces.js'
-import { waitFor } from './utils.js'
+import { sanitizeUUID, waitFor } from './utils.js'
 const debug = Debug('device')
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected'
@@ -111,7 +111,7 @@ export class HubDevice extends EventEmitter {
   }
 
   public async discoverCharacteristicsForService(uuid: string) {
-    const sanitizedUuid = this._sanitizeUUID(uuid)
+    const sanitizedUuid = sanitizeUUID(uuid)
     const services = await this.discoverServices(sanitizedUuid)
 
     debug('Service/characteristic discovery started')
@@ -128,7 +128,7 @@ export class HubDevice extends EventEmitter {
     uuid: string,
     callback: (data: Buffer) => void
   ) {
-    uuid = this._sanitizeUUID(uuid)
+    uuid = sanitizeUUID(uuid)
     this._characteristics[uuid].on('data', (data: Buffer) => {
       return callback(data)
     })
@@ -147,7 +147,7 @@ export class HubDevice extends EventEmitter {
     uuid: string,
     callback: (err: string | null, data: Buffer | null) => void
   ) {
-    uuid = this._sanitizeUUID(uuid)
+    uuid = sanitizeUUID(uuid)
     this._characteristics[uuid].read((err: string, data: Buffer) => {
       return callback(err, data)
     })
@@ -155,7 +155,7 @@ export class HubDevice extends EventEmitter {
 
   public writeToCharacteristic(uuid: string, data: Buffer) {
     return new Promise<void>((resolve, reject) => {
-      uuid = this._sanitizeUUID(uuid)
+      uuid = sanitizeUUID(uuid)
       this._characteristics[uuid].write(data, false, (error) => {
         if (error) {
           return reject(error)
@@ -164,9 +164,5 @@ export class HubDevice extends EventEmitter {
         return resolve()
       })
     })
-  }
-
-  private _sanitizeUUID(uuid: string) {
-    return uuid.replace(/-/g, '')
   }
 }

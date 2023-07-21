@@ -6,12 +6,6 @@ import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('movehub')
 
-/**
- * Mario is emitted if the discovered device is a LEGO Super Mario brick.
- * @class Mario
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class Mario extends LPF2Hub {
   constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.MARIO)

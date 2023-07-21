@@ -6,12 +6,6 @@ import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('duplotrainbase')
 
-/**
- * The DuploTrainBase is emitted if the discovered device is a Duplo Train Base.
- * @class DuploTrainBase
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class DuploTrainBase extends LPF2Hub {
   constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.DUPLO_TRAIN_BASE)

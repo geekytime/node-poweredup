@@ -2,10 +2,6 @@ import * as Consts from '../consts.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class MarioAccelerometer
- * @extends Device
- */
 export class MarioAccelerometer extends Device {
   constructor(hub: BaseHub, portId: number) {
     super(hub, portId, ModeMap, Consts.DeviceType.MARIO_ACCELEROMETER)

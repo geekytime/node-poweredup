@@ -7,12 +7,6 @@ import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('movehub')
 
-/**
- * The MoveHub is emitted if the discovered device is a Move Hub.
- * @class MoveHub
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class MoveHub extends LPF2Hub {
   constructor(device: HubDevice) {
     super(device, PortMap, Consts.HubType.MOVE_HUB)

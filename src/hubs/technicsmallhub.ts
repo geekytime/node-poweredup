@@ -6,12 +6,6 @@ import { LPF2Hub } from './lpf2hub.js'
 
 const debug = Debug('hub')
 
-/**
- * The TechnicSmallHub is emitted if the discovered device is a Technic Small Hub.
- * @class Hub
- * @extends LPF2Hub
- * @extends BaseHub
- */
 export class TechnicSmallHub extends LPF2Hub {
   protected _currentPort = 0x3b
 

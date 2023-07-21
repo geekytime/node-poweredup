@@ -20,12 +20,7 @@ export class AbsoluteMotor extends TachoMotor {
       const angle = normalizeAngle(
         message.readInt16LE(this.isWeDo2SmartHub ? 2 : 4)
       )
-      /**
-       * Emits when a the motors absolute position is changed.
-       * @event AbsoluteMotor#absolute
-       * @type {object}
-       * @param {number} absolute
-       */
+
       this.notify('absolute', { angle })
     } else {
       super.receive(message)
