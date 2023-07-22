@@ -1,4 +1,4 @@
-import { DeviceNumber } from './device-type.js'
+import { DeviceId } from './device-ids.js'
 import { ColorDistanceSensor } from './devices/colordistancesensor.js'
 import { CurrentSensor } from './devices/currentsensor.js'
 import { DuploTrainBaseColorSensor } from './devices/duplotrainbasecolorsensor.js'
@@ -86,7 +86,7 @@ export const createDeviceByType = ({
   portId
 }: {
   hub: BaseHub
-  deviceNumber: DeviceNumber
+  deviceNumber: DeviceId
   portId: number
 }) => {
   const Constructor = constructorsByNumber[deviceNumber]

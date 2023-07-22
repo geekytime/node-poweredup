@@ -33,8 +33,8 @@ const poweredUP = new PoweredUP();
 poweredUP.on("discover", async (hub) => { // Wait to discover a Hub
     console.log(`Discovered ${hub.name}!`);
     await hub.connect(); // Connect to the Hub
-    const motorA = await hub.waitForDeviceAtPort("A"); // Make sure a motor is plugged into port A
-    const motorB = await hub.waitForDeviceAtPort("B"); // Make sure a motor is plugged into port B
+    const motorA = await hub.waitForDeviceByPortName("A"); // Make sure a motor is plugged into port A
+    const motorB = await hub.waitForDeviceByPortName("B"); // Make sure a motor is plugged into port B
     console.log("Connected");
 
     console.log("Running motor B at speed 50");

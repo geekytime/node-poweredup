@@ -1,4 +1,4 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { TachoMotor } from './tachomotor.js'
 
@@ -8,6 +8,6 @@ import { TachoMotor } from './tachomotor.js'
  */
 export class MediumLinearMotor extends TachoMotor {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.MediumLinearMotor)
+    super(hub, portId, deviceIdsByName.MediumLinearMotor)
   }
 }

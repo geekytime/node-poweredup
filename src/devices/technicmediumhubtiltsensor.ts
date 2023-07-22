@@ -1,4 +1,4 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -7,7 +7,7 @@ export class TechnicMediumHubTiltSensor extends Device {
   protected _impactHoldoff: number = 10 // guess of default value
 
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.TechnicMediumHubTiltSensor)
+    super(hub, portId, deviceIdsByName.TechnicMediumHubTiltSensor)
   }
 
   public receive(message: Buffer) {

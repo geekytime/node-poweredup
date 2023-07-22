@@ -21,17 +21,15 @@ export class WeDo2SmartHub extends BaseHub {
   public async connect() {
     debug('Connecting to WeDo 2.0 Smart Hub')
     await super.connect()
-    await this._bleDevice.discoverCharacteristicsForService(
+    await this.hubDevice.discoverCharacteristicsForService(
       ServiceIds.WEDO2_SMART_HUB
     )
-    await this._bleDevice.discoverCharacteristicsForService(
+    await this.hubDevice.discoverCharacteristicsForService(
       ServiceIds.WEDO2_SMART_HUB_2
     )
 
-    await this._bleDevice.discoverCharacteristicsForService('battery_service')
-    await this._bleDevice.discoverCharacteristicsForService(
-      'device_information'
-    )
+    await this.hubDevice.discoverCharacteristicsForService('battery_service')
+    await this.hubDevice.discoverCharacteristicsForService('device_information')
 
     debug('Connect completed')
     this.emit('connect', this)
@@ -39,20 +37,20 @@ export class WeDo2SmartHub extends BaseHub {
   }
 
   async postConnectInit() {
-    this._bleDevice.subscribeToCharacteristic(
+    this.hubDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.WEDO2_PORT_TYPE,
       this._parsePortMessage.bind(this)
     )
-    this._bleDevice.subscribeToCharacteristic(
+    this.hubDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.WEDO2_SENSOR_VALUE,
       this._parseSensorMessage.bind(this)
     )
-    this._bleDevice.subscribeToCharacteristic(
+    this.hubDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.WEDO2_BUTTON,
       this._parseSensorMessage.bind(this)
     )
 
-    this._bleDevice.readFromCharacteristic(
+    this.hubDevice.readFromCharacteristic(
       '00002a19-0000-1000-8000-00805f9b34fb',
       (err, data) => {
         if (data) {
@@ -60,16 +58,16 @@ export class WeDo2SmartHub extends BaseHub {
         }
       }
     )
-    this._bleDevice.subscribeToCharacteristic(
+    this.hubDevice.subscribeToCharacteristic(
       '00002a19-0000-1000-8000-00805f9b34fb',
       this._parseHighCurrentAlert.bind(this)
     )
 
-    this._bleDevice.subscribeToCharacteristic(
+    this.hubDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.WEDO2_HIGH_CURRENT_ALERT,
       this._parseHighCurrentAlert.bind(this)
     )
-    this._bleDevice.readFromCharacteristic(
+    this.hubDevice.readFromCharacteristic(
       '00002a26-0000-1000-8000-00805f9b34fb',
       (err, data) => {
         if (data) {
@@ -118,7 +116,7 @@ export class WeDo2SmartHub extends BaseHub {
         message
       )
     }
-    return this._bleDevice.writeToCharacteristic(uuid, message)
+    return this.hubDevice.writeToCharacteristic(uuid, message)
   }
 
   public subscribe({
@@ -223,9 +221,9 @@ export class WeDo2SmartHub extends BaseHub {
         deviceNumber: deviceType,
         portId
       })
-      this._attachDevice(device)
+      this.attachDevice(device)
     } else if (event === 0x00) {
-      const device = this._getDeviceByPortId(portId)
+      const device = this.getDeviceByPortId(portId)
       if (device) {
         this._detachDevice(device)
       }
@@ -250,7 +248,7 @@ export class WeDo2SmartHub extends BaseHub {
     }
 
     const portId = message[1]
-    const device = this._getDeviceByPortId(portId)
+    const device = this.getDeviceByPortId(portId)
 
     if (device) {
       device.receive(message)

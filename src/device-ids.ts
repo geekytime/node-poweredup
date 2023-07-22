@@ -1,4 +1,4 @@
-export const deviceNumbersByName = {
+export const deviceIdsByName = {
   Unknown: 0,
   SimpleMediumLinearMotor: 1,
   TrainMotor: 2,
@@ -40,18 +40,15 @@ export const deviceNumbersByName = {
   TechnicLargeAngularMotorGrey: 76 // Technic Control+
 } as const
 
-export type DeviceName = keyof typeof deviceNumbersByName
-export type DeviceNumber =
-  (typeof deviceNumbersByName)[keyof typeof deviceNumbersByName]
-export const deviceNames = Object.keys(deviceNumbersByName) as DeviceName[]
-export const deviceNumbers = Object.values(
-  deviceNumbersByName
-) as DeviceNumber[]
+export type DeviceName = keyof typeof deviceIdsByName
+export type DeviceId = (typeof deviceIdsByName)[keyof typeof deviceIdsByName]
+export const deviceNames = Object.keys(deviceIdsByName) as DeviceName[]
+export const deviceIds = Object.values(deviceIdsByName) as DeviceId[]
 
-export const deviceNamesByNumber = Object.entries(deviceNumbersByName).reduce(
-  (acc, [name, number]) => {
-    acc[number] = name
+export const deviceNamesById = Object.entries(deviceIdsByName).reduce(
+  (acc, [name, id]) => {
+    acc[id] = name
     return acc
   },
-  {} as Record<DeviceName, DeviceNumber>
+  {} as Record<DeviceName, DeviceId>
 )

@@ -5,8 +5,8 @@ const run = async () => {
 
   const hub = await scanner.connectToHub()
   console.log(`Connected to ${hub.name}!`)
-  const motorA = await hub.waitForDeviceAtPort('A') // Make sure a motor is plugged into port A
-  const motorB = await hub.waitForDeviceAtPort('B') // Make sure a motor is plugged into port B
+  const motorA = await hub.waitForDeviceByPortName('A') // Make sure a motor is plugged into port A
+  const motorB = await hub.waitForDeviceByPortName('B') // Make sure a motor is plugged into port B
   console.log('Connected')
 
   // Repeat indefinitely

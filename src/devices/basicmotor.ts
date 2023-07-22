@@ -1,11 +1,11 @@
 import * as Consts from '../consts.js'
-import { DeviceNumber } from '../device-type.js'
+import { DeviceId } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp, mapSpeed } from '../utils.js'
 import { Device } from './device.js'
 
 export class BasicMotor extends Device {
-  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+  constructor(hub: BaseHub, portId: number, type: DeviceId) {
     super(hub, portId, type)
   }
 

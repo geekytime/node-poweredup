@@ -1,10 +1,10 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 export class TechnicMediumHubGyroSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.TechnicMediumHubGyroSensor)
+    super(hub, portId, deviceIdsByName.TechnicMediumHubGyroSensor)
   }
 
   public receive(message: Buffer) {

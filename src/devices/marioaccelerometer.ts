@@ -1,10 +1,10 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 export class MarioAccelerometer extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.MarioAccelerometer)
+    super(hub, portId, deviceIdsByName.MarioAccelerometer)
   }
 
   public receive(message: Buffer) {

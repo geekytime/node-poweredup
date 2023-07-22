@@ -1,4 +1,4 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,7 +8,7 @@ import { Device } from './device.js'
  */
 export class DuploTrainBaseSpeedometer extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.DuploTrainBaseSpeedometer)
+    super(hub, portId, deviceIdsByName.DuploTrainBaseSpeedometer)
   }
 
   public receive(message: Buffer) {

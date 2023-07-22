@@ -1,10 +1,10 @@
-import { DeviceNumber } from '../device-type.js'
+import { DeviceId } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { mapSpeed, normalizeAngle } from '../utils.js'
 import { TachoMotor } from './tachomotor.js'
 
 export class AbsoluteMotor extends TachoMotor {
-  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+  constructor(hub: BaseHub, portId: number, type: DeviceId) {
     super(hub, portId, type)
   }
 

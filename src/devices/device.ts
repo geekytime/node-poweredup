@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
-import { deviceNamesByNumber, DeviceNumber } from '../device-type.js'
+import { deviceNamesById, DeviceId } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 
 export abstract class Device extends EventEmitter {
@@ -15,7 +15,7 @@ export abstract class Device extends EventEmitter {
   private _hub: BaseHub
   private _portId: number
   private _connected: boolean = true
-  private _type: DeviceNumber
+  private _type: DeviceId
 
   private _isWeDo2SmartHub: boolean
   private _isVirtualPort: boolean = false
@@ -23,7 +23,7 @@ export abstract class Device extends EventEmitter {
 
   abstract get modes(): Record<string, number>
 
-  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+  constructor(hub: BaseHub, portId: number, type: DeviceId) {
     super()
     this._hub = hub
     this._portId = portId
@@ -84,7 +84,7 @@ export abstract class Device extends EventEmitter {
   }
 
   public get typeName() {
-    return deviceNamesByNumber[this.type]
+    return deviceNamesById[this.type]
   }
 
   public get mode() {

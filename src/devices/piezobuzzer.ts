@@ -1,11 +1,11 @@
 import * as Consts from '../consts.js'
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 export class PiezoBuzzer extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.PiezoBuzzer)
+    super(hub, portId, deviceIdsByName.PiezoBuzzer)
   }
 
   /**

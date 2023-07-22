@@ -44,8 +44,8 @@ poweredUP.on('discover', async (hub) => {
     const led = await remoteHub.waitForDeviceByType(
       PoweredUP.Consts.DeviceType.HUB_LED
     )
-    remoteButtonLeft = await remoteHub.waitForDeviceAtPort('LEFT')
-    remoteButtonRight = await remoteHub.waitForDeviceAtPort('RIGHT')
+    remoteButtonLeft = await remoteHub.waitForDeviceByPortName('LEFT')
+    remoteButtonRight = await remoteHub.waitForDeviceByPortName('RIGHT')
     led.setColor(TRAIN_LED_COLOR)
 
     remoteButtonLeft.on('remoteButton', ({ event }) => {

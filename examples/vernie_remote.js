@@ -30,33 +30,37 @@ poweredUP.on('discover', async (hub) => {
 
     remote.on('remoteButton', async (device, { event }) => {
       if (vernie) {
-        const leftTrack = await vernie.waitForDeviceAtPort('A')
-        const rightTrack = await vernie.waitForDeviceAtPort('B')
-        const head = await vernie.waitForDeviceAtPort('D')
+        const leftTrack = await vernie.waitForDeviceByPortName('A')
+        const rightTrack = await vernie.waitForDeviceByPortName('B')
+        const head = await vernie.waitForDeviceByPortName('D')
 
         console.log(event)
 
         switch (event) {
-          case PoweredUP.Consts.ButtonState.UP: { // If up is pressed, move the track forward
+          case PoweredUP.Consts.ButtonState.UP: {
+            // If up is pressed, move the track forward
             console.log(device.portName)
             device.portName === 'LEFT'
               ? leftTrack.setSpeed(50)
               : rightTrack.setSpeed(50)
             break
           }
-          case PoweredUP.Consts.ButtonState.DOWN: { // If down is pressed, move the track backwards
+          case PoweredUP.Consts.ButtonState.DOWN: {
+            // If down is pressed, move the track backwards
             device.portName === 'LEFT'
               ? leftTrack.setSpeed(-50)
               : rightTrack.setSpeed(-50)
             break
           }
-          case PoweredUP.Consts.ButtonState.RELEASED: { // Stop the track when the button is released
+          case PoweredUP.Consts.ButtonState.RELEASED: {
+            // Stop the track when the button is released
             device.portName === 'LEFT'
               ? leftTrack.setPower(0)
               : rightTrack.setPower(0)
             break
           }
-          case PoweredUP.Consts.ButtonState.STOP: { // Move the head left or right when a red button is pressed
+          case PoweredUP.Consts.ButtonState.STOP: {
+            // Move the head left or right when a red button is pressed
             await head.rotateByDegrees(
               35,
               device.portName === 'LEFT' ? -20 : 20
@@ -70,7 +74,7 @@ poweredUP.on('discover', async (hub) => {
     hub.on('button', async ({ event }) => {
       console.log(event)
       if (vernie) {
-        const head = await vernie.waitForDeviceAtPort('D')
+        const head = await vernie.waitForDeviceByPortName('D')
         if (event === PoweredUP.Consts.ButtonState.PRESSED) {
           await head.rotateByDegrees(80, 20)
           await head.rotateByDegrees(80, -20)

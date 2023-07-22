@@ -1,4 +1,4 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp } from '../utils.js'
 import { Device } from './device.js'
@@ -9,7 +9,7 @@ import { Device } from './device.js'
  */
 export class Light extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.Light)
+    super(hub, portId, deviceIdsByName.Light)
   }
 
   /**

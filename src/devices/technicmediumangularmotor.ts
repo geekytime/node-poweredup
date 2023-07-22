@@ -1,4 +1,4 @@
-import { DeviceNumber, deviceNumbersByName } from '../device-type.js'
+import { DeviceId, deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { AbsoluteMotor } from './absolutemotor.js'
 
@@ -6,7 +6,7 @@ export class TechnicMediumAngularMotor extends AbsoluteMotor {
   constructor(
     hub: BaseHub,
     portId: number,
-    type: DeviceNumber = deviceNumbersByName.TechnicMediumAngularMotor
+    type: DeviceId = deviceIdsByName.TechnicMediumAngularMotor
   ) {
     super(hub, portId, type)
   }

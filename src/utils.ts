@@ -115,7 +115,7 @@ export const sleep = (ms: number) => {
 
 export const nsPerMs = 1000000
 
-export const waitFor = async ({
+export const waitFor = async <Value>({
   timeoutMS,
   retryMS,
   checkFn,
@@ -123,16 +123,16 @@ export const waitFor = async ({
 }: {
   timeoutMS: number
   retryMS: number
-  checkFn: () => boolean | Promise<boolean>
+  checkFn: () => Value | false
   elapsed?: number
-}) => {
+}): Promise<Value> => {
   const start = process.hrtime.bigint()
   const result = await checkFn()
   const end = process.hrtime.bigint()
   elapsed += Number(end - start) / nsPerMs
 
   if (result) {
-    return
+    return result
   }
   if (elapsed > timeoutMS) {
     throw new Error('waitFor timed out after ${elapsed}ms')

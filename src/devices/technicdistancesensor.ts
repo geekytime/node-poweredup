@@ -1,10 +1,10 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
 export class TechnicDistanceSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.TechnicDistanceSensor)
+    super(hub, portId, deviceIdsByName.TechnicDistanceSensor)
   }
 
   public receive(message: Buffer) {

@@ -1,5 +1,5 @@
 import * as Consts from '../consts.js'
-import { DeviceNumber } from '../device-type.js'
+import { DeviceId } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { mapSpeed } from '../utils.js'
 import { BasicMotor } from './basicmotor.js'
@@ -14,7 +14,7 @@ export class TachoMotor extends BasicMotor {
   public useAccelerationProfile: boolean = true
   public useDecelerationProfile: boolean = true
 
-  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+  constructor(hub: BaseHub, portId: number, type: DeviceId) {
     super(hub, portId, type)
   }
 

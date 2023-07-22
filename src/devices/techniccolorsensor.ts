@@ -1,4 +1,4 @@
-import { deviceNumbersByName } from '../device-type.js'
+import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { parseColor } from '../utils.js'
 import { Device } from './device.js'
@@ -9,7 +9,7 @@ import { Device } from './device.js'
  */
 export class TechnicColorSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, deviceNumbersByName.TechnicColorSensor)
+    super(hub, portId, deviceIdsByName.TechnicColorSensor)
   }
 
   public receive(message: Buffer) {

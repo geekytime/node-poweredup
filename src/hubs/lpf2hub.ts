@@ -20,8 +20,8 @@ export class LPF2Hub extends BaseHub {
   public async connect() {
     debug('LPF2Hub connecting')
     await super.connect()
-    await this._bleDevice.discoverCharacteristicsForService(ServiceIds.LPF2_HUB)
-    this._bleDevice.subscribeToCharacteristic(
+    await this.hubDevice.discoverCharacteristicsForService(ServiceIds.LPF2_HUB)
+    this.hubDevice.subscribeToCharacteristic(
       Consts.BLECharacteristic.LPF2_ALL,
       this._parseMessage.bind(this)
     )
@@ -64,7 +64,7 @@ export class LPF2Hub extends BaseHub {
     message = Buffer.concat([Buffer.alloc(2), message])
     message[0] = message.length
     debug('Sent Message (LPF2_ALL)', message)
-    return this._bleDevice.writeToCharacteristic(uuid, message)
+    return this.hubDevice.writeToCharacteristic(uuid, message)
   }
 
   public subscribe({
@@ -98,11 +98,11 @@ export class LPF2Hub extends BaseHub {
    * @returns {Promise} Resolved upon successful issuance of command.
    */
   public createVirtualPort(firstPortName: string, secondPortName: string) {
-    const firstDevice = this.getDeviceAtPort(firstPortName)
+    const firstDevice = this.getDeviceByPortName(firstPortName)
     if (!firstDevice) {
       throw new Error(`Port ${firstPortName} does not have an attached device`)
     }
-    const secondDevice = this.getDeviceAtPort(secondPortName)
+    const secondDevice = this.getDeviceByPortName(secondPortName)
     if (!secondDevice) {
       throw new Error(`Port ${secondPortName} does not have an attached device`)
     }
@@ -264,9 +264,9 @@ export class LPF2Hub extends BaseHub {
         deviceNumber: deviceType,
         portId
       })
-      this._attachDevice(device)
+      this.attachDevice(device)
     } else if (event === Consts.Event.DETACHED_IO) {
-      const device = this._getDeviceByPortId(portId)
+      const device = this.getDeviceByPortId(portId)
       if (device) {
         this._detachDevice(device)
         if (this.isPortVirtual(portId)) {
@@ -291,7 +291,7 @@ export class LPF2Hub extends BaseHub {
         deviceNumber: deviceType,
         portId: virtualPortId
       })
-      this._attachDevice(device)
+      this.attachDevice(device)
     }
   }
 
@@ -421,7 +421,7 @@ export class LPF2Hub extends BaseHub {
 
   private _parsePortAction(message: Buffer) {
     for (let offset = 3; offset < message.length; offset += 2) {
-      const device = this._getDeviceByPortId(message[offset])
+      const device = this.getDeviceByPortId(message[offset])
 
       if (device) {
         device.finish(message[offset + 1])
@@ -431,7 +431,7 @@ export class LPF2Hub extends BaseHub {
 
   private _parseSensorMessage(message: Buffer) {
     const portId = message[3]
-    const device = this._getDeviceByPortId(portId)
+    const device = this.getDeviceByPortId(portId)
 
     if (device) {
       device.receive(message)
