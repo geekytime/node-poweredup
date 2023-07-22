@@ -1,4 +1,5 @@
 import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,7 +9,7 @@ import { Device } from './device.js'
  */
 export class DuploTrainBaseSpeaker extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.DUPLO_TRAIN_BASE_SPEAKER)
+    super(hub, portId, deviceNumbersByName.DuploTrainBaseSpeaker)
   }
 
   /**
@@ -34,6 +35,11 @@ export class DuploTrainBaseSpeaker extends Device {
   public playTone(tone: number) {
     this.subscribe(Mode.TONE)
     this.writeDirect(0x02, Buffer.from([tone]))
+  }
+
+  modes = {
+    sound: 1,
+    tone: 2
   }
 }
 

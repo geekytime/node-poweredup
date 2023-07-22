@@ -1,17 +1,17 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { parseColor } from '../utils.js'
 import { Device } from './device.js'
 
 export class DuploTrainBaseColorSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.DUPLO_TRAIN_BASE_COLOR_SENSOR)
+    super(hub, portId, deviceNumbersByName.DuploTrainBaseColorSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.INTENSITY) {
+    if (mode === this.modes.intensity) {
       const intensity = message[4]
 
       /**
@@ -21,7 +21,7 @@ export class DuploTrainBaseColorSensor extends Device {
        * @param {number} intensity
        */
       this.notify('intensity', { intensity })
-    } else if (mode === Mode.COLOR) {
+    } else if (mode === this.modes.color) {
       if (message[4] <= 10) {
         const color = parseColor(message[4])
 
@@ -33,7 +33,7 @@ export class DuploTrainBaseColorSensor extends Device {
          */
         this.notify('color', { color })
       }
-    } else if (mode === Mode.REFLECTIVITY) {
+    } else if (mode === this.modes.reflect) {
       const reflect = message[4]
 
       /**
@@ -43,7 +43,7 @@ export class DuploTrainBaseColorSensor extends Device {
        * @param {number} reflect Percentage, from 0 to 100.
        */
       this.notify('reflect', { reflect })
-    } else if (mode === Mode.RGB) {
+    } else if (mode === this.modes.rgb) {
       const red = Math.floor(message.readUInt16LE(4) / 4)
       const green = Math.floor(message.readUInt16LE(6) / 4)
       const blue = Math.floor(message.readUInt16LE(8) / 4)
@@ -59,18 +59,11 @@ export class DuploTrainBaseColorSensor extends Device {
       this.notify('rgb', { red, green, blue })
     }
   }
-}
 
-export enum Mode {
-  INTENSITY = 0x00,
-  COLOR = 0x01,
-  REFLECTIVITY = 0x02,
-  RGB = 0x03
-}
-
-export const ModeMap: { [event: string]: number } = {
-  intensity: Mode.INTENSITY,
-  color: Mode.COLOR,
-  reflect: Mode.REFLECTIVITY,
-  rgb: Mode.RGB
+  modes = {
+    intensity: 0,
+    color: 1,
+    reflect: 2,
+    rgb: 3
+  }
 }

@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { parseColor } from '../utils.js'
 import { Device } from './device.js'
@@ -9,13 +9,13 @@ import { Device } from './device.js'
  */
 export class TechnicColorSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.TECHNIC_COLOR_SENSOR)
+    super(hub, portId, deviceNumbersByName.TechnicColorSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.COLOR) {
+    if (mode === this.modes.color) {
       if (message[4] <= 10) {
         const color = parseColor(message[4])
 
@@ -27,7 +27,7 @@ export class TechnicColorSensor extends Device {
          */
         this.notify('color', { color })
       }
-    } else if (mode === Mode.REFLECTIVITY) {
+    } else if (mode === this.modes.reflect) {
       const reflect = message[4]
 
       /**
@@ -37,7 +37,7 @@ export class TechnicColorSensor extends Device {
        * @param {number} reflect Percentage, from 0 to 100.
        */
       this.notify('reflect', { reflect })
-    } else if (mode === Mode.AMBIENT_LIGHT) {
+    } else if (mode === this.modes.ambient) {
       const ambient = message[4]
 
       /**
@@ -68,16 +68,10 @@ export class TechnicColorSensor extends Device {
       Buffer.from([firstSegment, secondSegment, thirdSegment])
     )
   }
-}
 
-export enum Mode {
-  COLOR = 0x00,
-  REFLECTIVITY = 0x01,
-  AMBIENT_LIGHT = 0x02
-}
-
-export const ModeMap: { [event: string]: number } = {
-  color: Mode.COLOR,
-  reflect: Mode.REFLECTIVITY,
-  ambient: Mode.AMBIENT_LIGHT
+  modes = {
+    color: 0,
+    reflect: 1,
+    ambient: 2
+  }
 }

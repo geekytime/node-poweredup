@@ -1,25 +1,16 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class TechnicMediumHubGyroSensor
- * @extends Device
- */
 export class TechnicMediumHubGyroSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(
-      hub,
-      portId,
-      ModeMap,
-      Consts.DeviceType.TECHNIC_MEDIUM_HUB_GYRO_SENSOR
-    )
+    super(hub, portId, deviceNumbersByName.TechnicMediumHubGyroSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.GYRO) {
+    if (mode === this.modes.gyro) {
       /**
        * Emits when gyroscope detects movement. Measured in DPS - degrees per second.
        * @event TechnicMediumHubGyroSensor#gyro
@@ -34,12 +25,8 @@ export class TechnicMediumHubGyroSensor extends Device {
       this.notify('gyro', { x, y, z })
     }
   }
-}
 
-export enum Mode {
-  GYRO = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  gyro: Mode.GYRO
+  modes = {
+    gyro: 0
+  }
 }

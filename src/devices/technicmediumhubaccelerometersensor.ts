@@ -1,25 +1,16 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class TechnicMediumHubAccelerometerSensor
- * @extends Device
- */
 export class TechnicMediumHubAccelerometerSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(
-      hub,
-      portId,
-      ModeMap,
-      Consts.DeviceType.TECHNIC_MEDIUM_HUB_ACCELEROMETER
-    )
+    super(hub, portId, deviceNumbersByName.TechnicMediumHubAccelerometer)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.ACCEL) {
+    if (mode === this.modes.accel) {
       /**
        * Emits when accelerometer detects movement. Measured in mG.
        * @event TechnicMediumHubAccelerometerSensor#accel
@@ -34,12 +25,8 @@ export class TechnicMediumHubAccelerometerSensor extends Device {
       this.notify('accel', { x, y, z })
     }
   }
-}
 
-export enum Mode {
-  ACCEL = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  accel: Mode.ACCEL
+  modes = {
+    accel: 0
+  }
 }

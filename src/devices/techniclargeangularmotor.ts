@@ -1,18 +1,13 @@
-import * as Consts from '../consts.js'
+import { DeviceNumber, deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { AbsoluteMotor } from './absolutemotor.js'
 
-/**
- * @class TechnicLargeAngularMotor
- * @extends AbsoluteMotor
- */
 export class TechnicLargeAngularMotor extends AbsoluteMotor {
   constructor(
     hub: BaseHub,
     portId: number,
-    _modeMap: { [event: string]: number } = {},
-    type: Consts.DeviceType = Consts.DeviceType.TECHNIC_LARGE_ANGULAR_MOTOR
+    type: DeviceNumber = deviceNumbersByName.TechnicLargeAngularMotor
   ) {
-    super(hub, portId, {}, type)
+    super(hub, portId, type)
   }
 }

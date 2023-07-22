@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { TachoMotor } from './tachomotor.js'
 
@@ -8,6 +8,6 @@ import { TachoMotor } from './tachomotor.js'
  */
 export class MediumLinearMotor extends TachoMotor {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.MEDIUM_LINEAR_MOTOR)
+    super(hub, portId, deviceNumbersByName.MediumLinearMotor)
   }
 }

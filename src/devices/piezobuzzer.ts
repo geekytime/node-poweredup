@@ -1,14 +1,11 @@
 import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class PiezoBuzzer
- * @extends Device
- */
 export class PiezoBuzzer extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.PIEZO_BUZZER)
+    super(hub, portId, deviceNumbersByName.PiezoBuzzer)
   }
 
   /**
@@ -27,4 +24,6 @@ export class PiezoBuzzer extends Device {
       global.setTimeout(resolve, time)
     })
   }
+
+  modes = {}
 }

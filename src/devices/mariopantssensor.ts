@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,13 +8,13 @@ import { Device } from './device.js'
  */
 export class MarioPantsSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.MARIO_PANTS_SENSOR)
+    super(hub, portId, deviceNumbersByName.MarioPantsSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.PANTS) {
+    if (mode === this.modes.pants) {
       /**
        * Emits when the user changes the pants on Mario.
        * @event MarioPantsSensor#pants
@@ -25,12 +25,8 @@ export class MarioPantsSensor extends Device {
       this.notify('pants', { pants })
     }
   }
-}
 
-export enum Mode {
-  PANTS = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  pants: Mode.PANTS
+  modes = {
+    pants: 0
+  }
 }

@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { BasicMotor } from './basicmotor.js'
 
@@ -8,6 +8,6 @@ import { BasicMotor } from './basicmotor.js'
  */
 export class DuploTrainBaseMotor extends BasicMotor {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.DUPLO_TRAIN_BASE_MOTOR)
+    super(hub, portId, deviceNumbersByName.DuploTrainBaseMotor)
   }
 }

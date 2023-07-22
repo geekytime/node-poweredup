@@ -1,16 +1,12 @@
 import * as Consts from '../consts.js'
+import { DeviceNumber } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp, mapSpeed } from '../utils.js'
 import { Device } from './device.js'
 
 export class BasicMotor extends Device {
-  constructor(
-    hub: BaseHub,
-    portId: number,
-    modeMap: { [event: string]: number },
-    type: Consts.DeviceType = Consts.DeviceType.UNKNOWN
-  ) {
-    super(hub, portId, modeMap, type)
+  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+    super(hub, portId, type)
   }
 
   /**
@@ -64,4 +60,6 @@ export class BasicMotor extends Device {
     this.cancelEventTimer()
     return this.setPower(Consts.BrakingStyle.BRAKE)
   }
+
+  modes = {}
 }

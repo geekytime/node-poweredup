@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { calculateRamp } from '../utils.js'
 import { Device } from './device.js'
@@ -9,7 +9,7 @@ import { Device } from './device.js'
  */
 export class Light extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.LIGHT)
+    super(hub, portId, deviceNumbersByName.Light)
   }
 
   /**
@@ -50,4 +50,6 @@ export class Light extends Device {
         .on('finished', resolve)
     })
   }
+
+  modes = {}
 }

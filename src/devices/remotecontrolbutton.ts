@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,13 +8,13 @@ import { Device } from './device.js'
  */
 export class RemoteControlButton extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.REMOTE_CONTROL_BUTTON)
+    super(hub, portId, deviceNumbersByName.RemoteControlButton)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.BUTTON_EVENTS) {
+    if (mode === this.modes.remoteButton) {
       /**
        * Emits when a button on the remote is pressed or released.
        * @event RemoteControlButton#button
@@ -25,14 +25,10 @@ export class RemoteControlButton extends Device {
       this.notify('remoteButton', { event })
     }
   }
-}
 
-export enum Mode {
-  BUTTON_EVENTS = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  remoteButton: Mode.BUTTON_EVENTS
+  modes = {
+    remoteButton: 0
+  }
 }
 
 export const ButtonState: { [state: string]: number } = {

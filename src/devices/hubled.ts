@@ -1,4 +1,5 @@
 import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,7 +9,7 @@ import { Device } from './device.js'
  */
 export class HubLED extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.HUB_LED)
+    super(hub, portId, deviceNumbersByName.HubLed)
   }
 
   /**
@@ -32,7 +33,7 @@ export class HubLED extends Device {
           Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
         )
       } else {
-        this.subscribe(Mode.COLOR)
+        this.subscribe(this.modes.color)
         this.writeDirect(0x00, Buffer.from([color]))
       }
       return resolve()
@@ -59,15 +60,15 @@ export class HubLED extends Device {
           Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
         )
       } else {
-        this.subscribe(Mode.RGB)
+        this.subscribe(this.modes.rgb)
         this.writeDirect(0x01, Buffer.from([red, green, blue]))
       }
       return resolve()
     })
   }
-}
 
-export enum Mode {
-  COLOR = 0x00,
-  RGB = 0x01
+  modes = {
+    color: 0,
+    rgb: 1
+  }
 }

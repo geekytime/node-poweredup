@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,13 +8,13 @@ import { Device } from './device.js'
  */
 export class TiltSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.TILT_SENSOR)
+    super(hub, portId, deviceNumbersByName.TiltSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === TiltSensorMode.TILT) {
+    if (mode === this.modes.tilt) {
       const x = message.readInt8(this.isWeDo2SmartHub ? 2 : 4)
       const y = message.readInt8(this.isWeDo2SmartHub ? 3 : 5)
       /**
@@ -27,12 +27,8 @@ export class TiltSensor extends Device {
       this.notify('tilt', { x, y })
     }
   }
-}
 
-export enum TiltSensorMode {
-  TILT = 0
-}
-
-export const ModeMap: { [event: string]: number } = {
-  tilt: TiltSensorMode.TILT
+  modes = {
+    tilt: 0
+  }
 }

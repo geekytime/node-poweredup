@@ -1,20 +1,16 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class TechnicDistanceSensor
- * @extends Device
- */
 export class TechnicDistanceSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.TECHNIC_DISTANCE_SENSOR)
+    super(hub, portId, deviceNumbersByName.TechnicDistanceSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.DISTANCE) {
+    if (mode === this.modes.distance) {
       const distance = message.readUInt16LE(4)
 
       /**
@@ -24,7 +20,7 @@ export class TechnicDistanceSensor extends Device {
        * @param {number} distance Distance, from 40 to 2500mm
        */
       this.notify('distance', { distance })
-    } else if (mode === Mode.FAST_DISTANCE) {
+    } else if (mode === this.modes.fastDistance) {
       const fastDistance = message.readUInt16LE(4)
 
       /**
@@ -57,14 +53,9 @@ export class TechnicDistanceSensor extends Device {
       Buffer.from([topLeft, topRight, bottomLeft, bottomRight])
     )
   }
-}
 
-export enum Mode {
-  DISTANCE = 0x00,
-  FAST_DISTANCE = 0x01
-}
-
-export const ModeMap: { [event: string]: number } = {
-  distance: Mode.DISTANCE,
-  fastDistance: Mode.FAST_DISTANCE
+  modes = {
+    distance: 0,
+    fastDistance: 1
+  }
 }

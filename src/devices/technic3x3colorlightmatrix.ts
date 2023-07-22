@@ -1,15 +1,12 @@
 import { Color } from '../color.js'
 import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class Technic3x3ColorLightMatrix
- * @extends Device
- */
 export class Technic3x3ColorLightMatrix extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, {}, Consts.DeviceType.TECHNIC_3X3_COLOR_LIGHT_MATRIX)
+    super(hub, portId, deviceNumbersByName.Technic3x3ColorLightMatrix)
   }
 
   /**
@@ -20,7 +17,7 @@ export class Technic3x3ColorLightMatrix extends Device {
    */
   public setMatrix(colors: number[] | number | Color[] | Color) {
     return new Promise<void>((resolve) => {
-      this.subscribe(TechnicColorLightMatrixMode.PIX_0)
+      this.subscribe(this.modes.pix)
       const colorArray = new Array<number>(9)
       for (let i = 0; i < colorArray.length; i++) {
         if (typeof colors === 'number') {
@@ -40,18 +37,15 @@ export class Technic3x3ColorLightMatrix extends Device {
           colorArray[i] = (colors[i] as number) + (10 << 4) // If a raw color value, set it to max brightness (10)
         }
       }
-      this.writeDirect(
-        TechnicColorLightMatrixMode.PIX_0,
-        Buffer.from(colorArray)
-      )
+      this.writeDirect(this.modes.pix, Buffer.from(colorArray))
       return resolve()
     })
   }
-}
 
-export enum TechnicColorLightMatrixMode {
-  LEV_0 = 0,
-  COL_0 = 1,
-  PIX_0 = 2,
-  TRANS = 3
+  modes = {
+    lev: 0,
+    col: 1,
+    pix: 2,
+    trans: 3
+  }
 }

@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,13 +8,13 @@ import { Device } from './device.js'
  */
 export class MotionSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.MOTION_SENSOR)
+    super(hub, portId, deviceNumbersByName.MotionSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.DISTANCE) {
+    if (mode === this.modes.distance) {
       let distance = message[this.isWeDo2SmartHub ? 2 : 4]
       if (message[this.isWeDo2SmartHub ? 3 : 5] === 1) {
         distance = distance + 255
@@ -29,12 +29,8 @@ export class MotionSensor extends Device {
       this.notify('distance', { distance })
     }
   }
-}
 
-export enum Mode {
-  DISTANCE = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  distance: Mode.DISTANCE
+  modes = {
+    distance: 0
+  }
 }

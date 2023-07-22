@@ -1,6 +1,8 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { createDeviceByType } from '../createDeviceByType.js'
+import { deviceNamesByNumber, DeviceNumber } from '../device-type.js'
 import { ServiceIds } from '../hub-type.js'
 import { decodeMACAddress, decodeVersion, toBin, toHex } from '../utils.js'
 import { BaseHub } from './basehub.js'
@@ -65,14 +67,21 @@ export class LPF2Hub extends BaseHub {
     return this._bleDevice.writeToCharacteristic(uuid, message)
   }
 
-  public subscribe(portId: number, deviceType: number, mode: number) {
+  public subscribe({
+    portId,
+    mode
+  }: {
+    portId: number
+    deviceType?: number
+    mode: number
+  }) {
     return this.send(
       Buffer.from([0x41, portId, mode, 0x01, 0x00, 0x00, 0x00, 0x01]),
       Consts.BLECharacteristic.LPF2_ALL
     )
   }
 
-  public unsubscribe(portId: number, mode: number) {
+  public unsubscribe({ portId, mode }: { portId: number; mode: number }) {
     return this.send(
       Buffer.from([0x41, portId, mode, 0x01, 0x00, 0x00, 0x00, 0x00]),
       Consts.BLECharacteristic.LPF2_ALL
@@ -228,11 +237,12 @@ export class LPF2Hub extends BaseHub {
   private async _parsePortMessage(message: Buffer) {
     const portId = message[3]
     const event = message[4]
-    const deviceType = event ? message.readUInt16LE(5) : 0
+    const maybeDeviceType = message.readUInt16LE(5) as DeviceNumber
+    const deviceType: DeviceNumber = event ? maybeDeviceType : 0
 
     if (event === Consts.Event.ATTACHED_IO) {
       if (modeInfoDebug.enabled) {
-        const deviceTypeName = Consts.DeviceTypeNames[message[5]] || 'Unknown'
+        const deviceTypeName = deviceNamesByNumber[message[5]] || 'Unknown'
         modeInfoDebug(
           `Port ${toHex(portId)}, type ${toHex(
             deviceType,
@@ -249,7 +259,11 @@ export class LPF2Hub extends BaseHub {
         await this._sendPortInformationRequest(portId)
       }
 
-      const device = this._createDevice(deviceType, portId)
+      const device = createDeviceByType({
+        hub: this,
+        deviceNumber: deviceType,
+        portId
+      })
       this._attachDevice(device)
     } else if (event === Consts.Event.DETACHED_IO) {
       const device = this._getDeviceByPortId(portId)
@@ -272,7 +286,11 @@ export class LPF2Hub extends BaseHub {
       const virtualPortId = message[3]
       this._portMap[virtualPortName] = virtualPortId
       this._virtualPorts.push(virtualPortId)
-      const device = this._createDevice(deviceType, virtualPortId)
+      const device = createDeviceByType({
+        hub: this,
+        deviceNumber: deviceType,
+        portId: virtualPortId
+      })
       this._attachDevice(device)
     }
   }

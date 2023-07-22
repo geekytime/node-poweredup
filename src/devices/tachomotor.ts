@@ -1,4 +1,5 @@
 import * as Consts from '../consts.js'
+import { DeviceNumber } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { mapSpeed } from '../utils.js'
 import { BasicMotor } from './basicmotor.js'
@@ -13,19 +14,14 @@ export class TachoMotor extends BasicMotor {
   public useAccelerationProfile: boolean = true
   public useDecelerationProfile: boolean = true
 
-  constructor(
-    hub: BaseHub,
-    portId: number,
-    modeMap: { [event: string]: number } = {},
-    type: Consts.DeviceType = Consts.DeviceType.UNKNOWN
-  ) {
-    super(hub, portId, Object.assign({}, modeMap, ModeMap), type)
+  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
+    super(hub, portId, type)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.ROTATION) {
+    if (mode === this.modes.rotate) {
       const degrees = message.readInt32LE(this.isWeDo2SmartHub ? 2 : 4)
       /**
        * Emits when a rotation sensor is activated.
@@ -250,12 +246,8 @@ export class TachoMotor extends BasicMotor {
     }
     return value
   }
-}
 
-export enum Mode {
-  ROTATION = 0x02
-}
-
-export const ModeMap: { [event: string]: number } = {
-  rotate: Mode.ROTATION
+  modes = {
+    rotate: 2
+  }
 }

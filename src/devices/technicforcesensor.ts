@@ -1,20 +1,16 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class TechnicForceSensor
- * @extends Device
- */
 export class TechnicForceSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.TECHNIC_FORCE_SENSOR)
+    super(hub, portId, deviceNumbersByName.TechnicForceSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.FORCE) {
+    if (mode === this.modes.force) {
       const force = message[this.isWeDo2SmartHub ? 2 : 4] / 10
 
       /**
@@ -24,7 +20,7 @@ export class TechnicForceSensor extends Device {
        * @param {number} force Force, in newtons (0-10).
        */
       this.notify('force', { force })
-    } else if (mode === Mode.TOUCHED) {
+    } else if (mode === this.modes.touched) {
       const touched = message[4] ? true : false
 
       /**
@@ -34,7 +30,7 @@ export class TechnicForceSensor extends Device {
        * @param {boolean} touch Touched on/off (boolean).
        */
       this.notify('touched', { touched })
-    } else if (mode === Mode.TAPPED) {
+    } else if (mode === this.modes.tapped) {
       const tapped = message[4]
 
       /**
@@ -46,16 +42,10 @@ export class TechnicForceSensor extends Device {
       this.notify('tapped', { tapped })
     }
   }
-}
 
-export enum Mode {
-  FORCE = 0,
-  TOUCHED = 1,
-  TAPPED = 2
-}
-
-export const ModeMap: { [event: string]: number } = {
-  force: Mode.FORCE,
-  touched: Mode.TOUCHED,
-  tapped: Mode.TAPPED
+  modes = {
+    force: 0,
+    touched: 1,
+    tapped: 2
+  }
 }

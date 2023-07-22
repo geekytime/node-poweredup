@@ -1,21 +1,17 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { parseColor } from '../utils.js'
 import { Device } from './device.js'
 
-/**
- * @class ColorDistanceSensor
- * @extends Device
- */
 export class ColorDistanceSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.COLOR_DISTANCE_SENSOR)
+    super(hub, portId, deviceNumbersByName.ColorDistanceSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === ColorDistanceSensorMode.COLOR) {
+    if (mode === this.modes.color) {
       if (message[this.isWeDo2SmartHub ? 2 : 4] <= 10) {
         const color = parseColor(message[this.isWeDo2SmartHub ? 2 : 4])
 
@@ -27,7 +23,7 @@ export class ColorDistanceSensor extends Device {
          */
         this.notify('color', { color })
       }
-    } else if (mode === ColorDistanceSensorMode.DISTANCE) {
+    } else if (mode === this.modes.distance) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -46,7 +42,7 @@ export class ColorDistanceSensor extends Device {
          */
         this.notify('distance', { distance })
       }
-    } else if (mode === ColorDistanceSensorMode.DISTANCE_COUNT) {
+    } else if (mode === this.modes.distanceCount) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -62,7 +58,7 @@ export class ColorDistanceSensor extends Device {
        * @param {number} number of distance events.
        */
       this.notify('distanceCount', { count })
-    } else if (mode === ColorDistanceSensorMode.REFLECT) {
+    } else if (mode === this.modes.reflect) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -74,7 +70,7 @@ export class ColorDistanceSensor extends Device {
        * @param {number} percentage from 0 to 100.
        */
       this.notify('reflect', { reflect })
-    } else if (mode === ColorDistanceSensorMode.AMBIENT) {
+    } else if (mode === this.modes.ambient) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -86,7 +82,7 @@ export class ColorDistanceSensor extends Device {
        * @param {number} percentage from 0 to 100.
        */
       this.notify('ambient', { ambient })
-    } else if (mode === ColorDistanceSensorMode.RGB_I) {
+    } else if (mode === this.modes.rgbIntensity) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -106,7 +102,7 @@ export class ColorDistanceSensor extends Device {
        * @param {number} blue
        */
       this.notify('rgbIntensity', { red, green, blue })
-    } else if (mode === ColorDistanceSensorMode.COLOR_AND_DISTANCE) {
+    } else if (mode === this.modes.colorAndDistance) {
       if (this.isWeDo2SmartHub) {
         return
       }
@@ -216,7 +212,7 @@ export class ColorDistanceSensor extends Device {
       const payload = Buffer.alloc(2)
       payload[0] = (message[0] << 4) + (message[1] >> 4)
       payload[1] = message[0] >> 4
-      this.subscribe(ColorDistanceSensorMode.PF_IR)
+      this.subscribe(this.modes.powerFunctionsIr)
       return this.writeDirect(0x07, payload)
     }
   }
@@ -237,7 +233,7 @@ export class ColorDistanceSensor extends Device {
           'Setting LED color is not available on the WeDo 2.0 Smart Hub'
         )
       } else {
-        this.subscribe(ColorDistanceSensorMode.LED)
+        this.subscribe(this.modes.led)
         this.writeDirect(0x05, Buffer.from([color as number]))
       }
       return resolve()
@@ -269,28 +265,18 @@ export class ColorDistanceSensor extends Device {
   private _pfPowerToPWM(power: number) {
     return power & 15
   }
-}
 
-export enum ColorDistanceSensorMode {
-  COLOR = 0,
-  DISTANCE = 1,
-  DISTANCE_COUNT = 2,
-  REFLECT = 3,
-  AMBIENT = 4,
-  LED = 5,
-  RGB_I = 6,
-  PF_IR = 7,
-  COLOR_AND_DISTANCE = 8
-}
-
-export const ModeMap = {
-  color: ColorDistanceSensorMode.COLOR,
-  distance: ColorDistanceSensorMode.DISTANCE,
-  distanceCount: ColorDistanceSensorMode.DISTANCE_COUNT,
-  reflect: ColorDistanceSensorMode.REFLECT,
-  ambient: ColorDistanceSensorMode.AMBIENT,
-  rgbIntensity: ColorDistanceSensorMode.RGB_I,
-  colorAndDistance: ColorDistanceSensorMode.COLOR_AND_DISTANCE
+  modes: {
+    color: 0
+    distance: 1
+    distanceCount: 2
+    reflect: 3
+    ambient: 4
+    led: 5
+    rgbIntensity: 6
+    powerFunctionsIr: 7
+    colorAndDistance: 8
+  }
 }
 
 export enum Output {

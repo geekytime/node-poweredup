@@ -1,6 +1,8 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
+import { createDeviceByType } from '../createDeviceByType.js'
+import { DeviceNumber } from '../device-type.js'
 import { HubDevice } from '../hub-device.js'
 import { ServiceIds } from '../hub-type.js'
 import { BaseHub } from './basehub.js'
@@ -119,7 +121,15 @@ export class WeDo2SmartHub extends BaseHub {
     return this._bleDevice.writeToCharacteristic(uuid, message)
   }
 
-  public subscribe(portId: number, deviceType: number, mode: number) {
+  public subscribe({
+    portId,
+    deviceType,
+    mode
+  }: {
+    portId: number
+    deviceType: number
+    mode: number
+  }) {
     this.send(
       Buffer.from([
         0x01,
@@ -138,7 +148,15 @@ export class WeDo2SmartHub extends BaseHub {
     )
   }
 
-  public unsubscribe(portId: number, deviceType: number, mode: number) {
+  public unsubscribe({
+    portId,
+    deviceType,
+    mode
+  }: {
+    portId: number
+    deviceType: number
+    mode: number
+  }) {
     this.send(
       Buffer.from([
         0x01,
@@ -193,12 +211,18 @@ export class WeDo2SmartHub extends BaseHub {
   private _parsePortMessage(data: Buffer) {
     debug('Received Message (WEDO2_PORT_TYPE)', data)
 
-    const portId = data[0]
-    const event = data[1]
-    const deviceType = event ? data[3] : 0
+    const portId = data[0] as DeviceNumber
+    const event = data[1] as DeviceNumber
+    const maybeDeviceType = data[3] as DeviceNumber
 
-    if (event === 0x01) {
-      const device = this._createDevice(deviceType, portId)
+    const deviceType: DeviceNumber = event ? maybeDeviceType : 0
+
+    if (event === 1) {
+      const device = createDeviceByType({
+        hub: this,
+        deviceNumber: deviceType,
+        portId
+      })
       this._attachDevice(device)
     } else if (event === 0x00) {
       const device = this._getDeviceByPortId(portId)

@@ -2,8 +2,8 @@ import { Characteristic, Peripheral, Service } from '@abandonware/noble'
 import Debug from 'debug'
 import { EventEmitter } from 'events'
 
-// import { IBLEAbstraction } from './interfaces.js'
 import { sanitizeUUID, waitFor } from './utils.js'
+
 const debug = Debug('device')
 
 export type ConnectionState = 'disconnected' | 'connecting' | 'connected'

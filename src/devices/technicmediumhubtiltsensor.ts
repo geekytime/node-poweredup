@@ -1,37 +1,19 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class TechnicMediumHubTiltSensor
- * @extends Device
- */
 export class TechnicMediumHubTiltSensor extends Device {
   protected _impactThreshold: number = 10 // guess of default value
   protected _impactHoldoff: number = 10 // guess of default value
 
   constructor(hub: BaseHub, portId: number) {
-    super(
-      hub,
-      portId,
-      ModeMap,
-      Consts.DeviceType.TECHNIC_MEDIUM_HUB_TILT_SENSOR
-    )
+    super(hub, portId, deviceNumbersByName.TechnicMediumHubTiltSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.TILT) {
-      /**
-       * Emits when a tilt sensor is activated.
-       *
-       * @event TechnicMediumHubTiltSensor#tilt
-       * @type {object}
-       * @param {number} x
-       * @param {number} y
-       * @param {number} z
-       */
+    if (mode === this.modes.tilt) {
       let z = -message.readInt16LE(4)
       const y = message.readInt16LE(6)
       const x = message.readInt16LE(8)
@@ -44,7 +26,7 @@ export class TechnicMediumHubTiltSensor extends Device {
       }
 
       this.notify('tilt', { x, y, z })
-    } else if (mode === Mode.IMPACT_COUNT && message.length === 8) {
+    } else if (mode === this.modes.impactCount && message.length === 8) {
       const count = message.readUInt32LE(4)
       /**
        * Emits when proper acceleration is above threshold (e.g. on impact when being thrown to the ground).
@@ -105,14 +87,9 @@ export class TechnicMediumHubTiltSensor extends Device {
       return resolve()
     })
   }
-}
 
-export enum Mode {
-  TILT = 0x00,
-  IMPACT_COUNT = 0x01
-}
-
-export const ModeMap: { [event: string]: number } = {
-  tilt: Mode.TILT,
-  impactCount: Mode.IMPACT_COUNT
+  modes = {
+    tilt: 0,
+    impactCount: 1
+  }
 }

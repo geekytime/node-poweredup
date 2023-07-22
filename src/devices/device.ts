@@ -1,9 +1,10 @@
 import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
+import { deviceNamesByNumber, DeviceNumber } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 
-export class Device extends EventEmitter {
+export abstract class Device extends EventEmitter {
   public autoSubscribe: boolean = true
   public values: Record<string, unknown> = {}
 
@@ -14,69 +15,58 @@ export class Device extends EventEmitter {
   private _hub: BaseHub
   private _portId: number
   private _connected: boolean = true
-  private _type: Consts.DeviceType
-  private _modeMap: Record<string, number> = {}
+  private _type: DeviceNumber
 
   private _isWeDo2SmartHub: boolean
   private _isVirtualPort: boolean = false
   private _eventTimer: NodeJS.Timer | null = null
 
-  constructor(
-    hub: BaseHub,
-    portId: number,
-    modeMap: { [event: string]: number } = {},
-    type: Consts.DeviceType = Consts.DeviceType.UNKNOWN
-  ) {
+  abstract get modes(): Record<string, number>
+
+  constructor(hub: BaseHub, portId: number, type: DeviceNumber) {
     super()
     this._hub = hub
     this._portId = portId
     this._type = type
-    this._modeMap = modeMap
     this._isWeDo2SmartHub = this.hub.type === Consts.HubType.WEDO2_SMART_HUB
     this._isVirtualPort = this.hub.isPortVirtual(portId)
-
-    const eventAttachListener = (event: string) => {
-      if (event === 'detach') {
-        return
-      }
-      if (this.autoSubscribe) {
-        if (this._modeMap[event] !== undefined) {
-          this.subscribe(this._modeMap[event])
-        }
-      }
-    }
-
-    const deviceDetachListener = (device: Device) => {
-      if (device.portId === this.portId) {
-        this._connected = false
-        this.hub.removeListener('detach', deviceDetachListener)
-        this.emit('detach')
-      }
-    }
-
-    for (const event in this._modeMap) {
-      if (this.hub.listenerCount(event) > 0) {
-        eventAttachListener(event)
-      }
-    }
-
-    this.hub.on('newListener', eventAttachListener)
-    this.on('newListener', eventAttachListener)
-    this.hub.on('detach', deviceDetachListener)
   }
 
-  /**
-   * @readonly
-   * @property {boolean} connected Check if the device is still attached.
-   */
+  initEvents = () => {
+    for (const event in this.modes) {
+      if (this.hub.listenerCount(event) > 0) {
+        this.handleNewListener(event)
+      }
+    }
+
+    this.hub.on('newListener', this.handleNewListener)
+    this.on('newListener', this.handleNewListener)
+    this.hub.on('detach', this.handleDetach)
+  }
+
+  handleNewListener = (event: string) => {
+    if (event === 'detach') {
+      return
+    }
+    if (this.autoSubscribe) {
+      if (this.modes[event] !== undefined) {
+        this.subscribe(this.modes[event])
+      }
+    }
+  }
+
+  handleDetach = (device: Device) => {
+    if (device.portId === this.portId) {
+      this._connected = false
+      this.hub.removeListener('detach', this.handleDetach)
+      this.emit('detach')
+    }
+  }
+
   public get connected() {
     return this._connected
   }
 
-  /**
-   * @readonly
-   * @property {Hub} hub The Hub the device is attached to.
-   */
   public get hub() {
     return this._hub
   }
@@ -85,30 +75,18 @@ export class Device extends EventEmitter {
     return this._portId
   }
 
-  /**
-   * @readonly
-   * @property {string} portName The port the device is attached to.
-   */
   public get portName() {
     return this.hub.getPortNameForPortId(this.portId)
   }
 
-  /**
-   * @readonly
-   * @property {number} type The type of the device
-   */
   public get type() {
     return this._type
   }
 
   public get typeName() {
-    return Consts.DeviceTypeNames[this.type]
+    return deviceNamesByNumber[this.type]
   }
 
-  /**
-   * @readonly
-   * @property {number} mode The mode the device is currently in
-   */
   public get mode() {
     return this._mode
   }
@@ -117,10 +95,6 @@ export class Device extends EventEmitter {
     return this._isWeDo2SmartHub
   }
 
-  /**
-   * @readonly
-   * @property {boolean} isVirtualPort Is this device attached to a virtual port (ie. a combined device)
-   */
   protected get isVirtualPort() {
     return this._isVirtualPort
   }
@@ -154,7 +128,7 @@ export class Device extends EventEmitter {
     this._ensureConnected()
     if (mode !== this._mode) {
       this._mode = mode
-      this.hub.subscribe(this.portId, this.type, mode)
+      this.hub.subscribe({ portId: this.portId, mode })
     }
   }
 

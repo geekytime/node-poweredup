@@ -1,4 +1,5 @@
 import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,14 +9,14 @@ import { Device } from './device.js'
  */
 export class CurrentSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.CURRENT_SENSOR)
+    super(hub, portId, deviceNumbersByName.CurrentSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this.mode
 
     switch (mode) {
-      case Mode.CURRENT:
+      case this.modes.current:
         if (this.isWeDo2SmartHub) {
           const current = message.readInt16LE(2) / 1000
           this.notify('current', { current })
@@ -41,14 +42,10 @@ export class CurrentSensor extends Device {
         break
     }
   }
-}
 
-export enum Mode {
-  CURRENT = 0x00
-}
-
-export const ModeMap: { [event: string]: number } = {
-  current: Mode.CURRENT
+  modes = {
+    current: 0
+  }
 }
 
 const MaxCurrentValue: { [hubType: number]: number } = {

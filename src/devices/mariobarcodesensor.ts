@@ -1,4 +1,4 @@
-import * as Consts from '../consts.js'
+import { deviceNumbersByName } from '../device-type.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
@@ -8,13 +8,13 @@ import { Device } from './device.js'
  */
 export class MarioBarcodeSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
-    super(hub, portId, ModeMap, Consts.DeviceType.MARIO_BARCODE_SENSOR)
+    super(hub, portId, deviceNumbersByName.MarioBarcodeSensor)
   }
 
   public receive(message: Buffer) {
     const mode = this._mode
 
-    if (mode === Mode.BARCODE) {
+    if (mode === this.modes.barcode) {
       /**
        * Emits when the barcode sensor sees a barcode.
        * @event MarioBarcodeSensor#barcode
@@ -30,7 +30,7 @@ export class MarioBarcodeSensor extends Device {
         // This is a color
         this.notify('barcode', { color })
       }
-    } else if (mode === Mode.RGB) {
+    } else if (mode === this.modes.rgb) {
       /**
        * Emits when the barcode sensor sees a RGB color.
        * @event MarioBarcodeSensor#rgb
@@ -45,14 +45,9 @@ export class MarioBarcodeSensor extends Device {
       this.notify('rgb', { r, g, b })
     }
   }
-}
 
-export enum Mode {
-  BARCODE = 0,
-  RGB = 1
-}
-
-export const ModeMap: { [event: string]: number } = {
-  barcode: Mode.BARCODE,
-  rgb: Mode.RGB
+  modes = {
+    barcode: 0,
+    rgb: 1
+  }
 }
