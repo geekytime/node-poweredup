@@ -8,7 +8,7 @@ export class TechnicForceSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.force) {
       const force = message[this.isWeDo2SmartHub ? 2 : 4] / 10

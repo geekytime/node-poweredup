@@ -8,7 +8,7 @@ export class MarioAccelerometer extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.accel) {
       const x = message[4]

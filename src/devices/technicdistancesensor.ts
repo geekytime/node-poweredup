@@ -8,7 +8,7 @@ export class TechnicDistanceSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.distance) {
       const distance = message.readUInt16LE(4)

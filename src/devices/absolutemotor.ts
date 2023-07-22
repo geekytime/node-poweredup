@@ -9,7 +9,7 @@ export class AbsoluteMotor extends TachoMotor {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.absolute) {
       const angle = normalizeAngle(

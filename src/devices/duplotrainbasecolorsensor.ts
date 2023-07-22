@@ -9,7 +9,7 @@ export class DuploTrainBaseColorSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.intensity) {
       const intensity = message[4]

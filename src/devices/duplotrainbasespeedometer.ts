@@ -12,7 +12,7 @@ export class DuploTrainBaseSpeedometer extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.speed) {
       const speed = message.readInt16LE(4)

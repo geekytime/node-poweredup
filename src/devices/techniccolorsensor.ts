@@ -13,7 +13,7 @@ export class TechnicColorSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.color) {
       if (message[4] <= 10) {

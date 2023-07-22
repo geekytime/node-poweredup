@@ -174,33 +174,33 @@ export abstract class BaseHub extends EventEmitter {
 
   public abstract subscribe(_: {
     portId: number
-    deviceType?: number
+    deviceId?: DeviceId
     mode: number
   })
 
   public abstract unsubscribe(_: {
     portId: number
-    deviceType?: number
+    deviceId?: DeviceId
     mode: number
   })
 
-  public manuallyAttachDevice(deviceType: DeviceId, portId: number) {
+  public manuallyAttachDevice(deviceId: DeviceId, portId: number) {
     if (!this.getDeviceByPortId(portId)) {
       debug(
-        `No device attached to portId ${portId}, creating and attaching device type ${deviceType}`
+        `No device attached to portId ${portId}, creating and attaching device type ${deviceId}`
       )
       const device = createDeviceByType({
         hub: this,
-        deviceNumber: deviceType,
+        deviceNumber: deviceId,
         portId
       })
       this.attachDevice(device)
       return device
     } else {
       const device = this.getDeviceByPortId(portId)
-      if (device?.type === deviceType) {
+      if (device?.type === deviceId) {
         debug(
-          `Device of ${deviceType} already attached to portId ${portId}, returning existing device`
+          `Device of ${deviceId} already attached to portId ${portId}, returning existing device`
         )
         return device
       } else {

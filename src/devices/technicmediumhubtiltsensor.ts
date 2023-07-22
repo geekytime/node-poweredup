@@ -11,7 +11,7 @@ export class TechnicMediumHubTiltSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.tilt) {
       let z = -message.readInt16LE(4)

@@ -9,7 +9,7 @@ export class ColorDistanceSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.color) {
       if (message[this.isWeDo2SmartHub ? 2 : 4] <= 10) {

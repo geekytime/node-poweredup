@@ -8,7 +8,7 @@ export class TechnicMediumHubAccelerometerSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.accel) {
       /**

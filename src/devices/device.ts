@@ -1,35 +1,38 @@
 import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
-import { deviceNamesById, DeviceId } from '../device-ids.js'
+import { DeviceId, deviceNamesById } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 
-export abstract class Device extends EventEmitter {
-  public autoSubscribe: boolean = true
-  public values: Record<string, unknown> = {}
+export type DeviceConnectionState = 'connected' | 'disconnected'
 
-  protected _mode: number | undefined
-  protected _busy: boolean = false
+export abstract class Device extends EventEmitter {
+  autoSubscribe: boolean = true
+  values: Record<string, unknown> = {}
+
+  protected mode: number | undefined
+  protected busy: boolean = false
   protected _finishedCallbacks: (() => void)[] = []
 
-  private _hub: BaseHub
-  private _portId: number
-  private _connected: boolean = true
-  private _type: DeviceId
+  hub: BaseHub
+  portId: number
+  connectionState: DeviceConnectionState
+  deviceId: DeviceId
 
-  private _isWeDo2SmartHub: boolean
-  private _isVirtualPort: boolean = false
-  private _eventTimer: NodeJS.Timer | null = null
+  isWeDo2SmartHub: boolean
+  isVirtualPort: boolean = false
+  private eventTimer: NodeJS.Timer | null = null
 
   abstract get modes(): Record<string, number>
 
   constructor(hub: BaseHub, portId: number, type: DeviceId) {
     super()
-    this._hub = hub
-    this._portId = portId
-    this._type = type
-    this._isWeDo2SmartHub = this.hub.type === Consts.HubType.WEDO2_SMART_HUB
-    this._isVirtualPort = this.hub.isPortVirtual(portId)
+    this.connectionState = 'connected'
+    this.hub = hub
+    this.portId = portId
+    this.deviceId = type
+    this.isWeDo2SmartHub = this.hub.type === Consts.HubType.WEDO2_SMART_HUB
+    this.isVirtualPort = this.hub.isPortVirtual(portId)
   }
 
   initEvents = () => {
@@ -57,22 +60,14 @@ export abstract class Device extends EventEmitter {
 
   handleDetach = (device: Device) => {
     if (device.portId === this.portId) {
-      this._connected = false
+      this.connectionState = 'disconnected'
       this.hub.removeListener('detach', this.handleDetach)
       this.emit('detach')
     }
   }
 
   public get connected() {
-    return this._connected
-  }
-
-  public get hub() {
-    return this._hub
-  }
-
-  public get portId() {
-    return this._portId
+    return this.connectionState === 'connected'
   }
 
   public get portName() {
@@ -80,23 +75,11 @@ export abstract class Device extends EventEmitter {
   }
 
   public get type() {
-    return this._type
+    return this.deviceId
   }
 
   public get typeName() {
     return deviceNamesById[this.type]
-  }
-
-  public get mode() {
-    return this._mode
-  }
-
-  protected get isWeDo2SmartHub() {
-    return this._isWeDo2SmartHub
-  }
-
-  protected get isVirtualPort() {
-    return this._isVirtualPort
   }
 
   public writeDirect(mode: number, data: Buffer) {
@@ -120,20 +103,20 @@ export abstract class Device extends EventEmitter {
     data: Buffer,
     characteristic: string = Consts.BLECharacteristic.LPF2_ALL
   ) {
-    this._ensureConnected()
+    this.assertConnected()
     return this.hub.send(data, characteristic)
   }
 
   public subscribe(mode: number) {
-    this._ensureConnected()
-    if (mode !== this._mode) {
-      this._mode = mode
+    this.assertConnected()
+    if (mode !== this.mode) {
+      this.mode = mode
       this.hub.subscribe({ portId: this.portId, mode })
     }
   }
 
   public unsubscribe() {
-    this._ensureConnected()
+    this.assertConnected()
   }
 
   public receive(message: Buffer) {
@@ -154,8 +137,8 @@ export abstract class Device extends EventEmitter {
 
   public finish(message: number) {
     if ((message & 0x10) === 0x10) return // "busy/full"
-    this._busy = (message & 0x01) === 0x01
-    while (this._finishedCallbacks.length > Number(this._busy)) {
+    this.busy = (message & 0x01) === 0x01
+    while (this._finishedCallbacks.length > Number(this.busy)) {
       const callback = this._finishedCallbacks.shift()
       if (callback) {
         callback()
@@ -164,17 +147,17 @@ export abstract class Device extends EventEmitter {
   }
 
   public setEventTimer(timer: NodeJS.Timer) {
-    this._eventTimer = timer
+    this.eventTimer = timer
   }
 
   public cancelEventTimer() {
-    if (this._eventTimer) {
-      clearTimeout(this._eventTimer)
-      this._eventTimer = null
+    if (this.eventTimer) {
+      clearTimeout(this.eventTimer)
+      this.eventTimer = null
     }
   }
 
-  private _ensureConnected() {
+  private assertConnected() {
     if (!this.connected) {
       throw new Error('Device is not connected')
     }

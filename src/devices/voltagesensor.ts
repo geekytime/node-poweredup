@@ -13,7 +13,7 @@ export class VoltageSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    if ((this._mode = this.modes.voltage)) {
+    if ((this.mode = this.modes.voltage)) {
       if (this.isWeDo2SmartHub) {
         const voltage = message.readInt16LE(2) / 40
         this.notify('voltage', { voltage })

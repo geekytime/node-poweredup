@@ -1,8 +1,8 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { createDeviceByType } from '../createDeviceByType.js'
-import { deviceNamesByNumber, DeviceNumber } from '../device-type.js'
+import { createDeviceByType } from '../create-device-by-type.js'
+import { DeviceId, DeviceName, deviceNamesById } from '../device-ids.js'
 import { ServiceIds } from '../hub-type.js'
 import { decodeMACAddress, decodeVersion, toBin, toHex } from '../utils.js'
 import { BaseHub } from './basehub.js'
@@ -67,14 +67,7 @@ export class LPF2Hub extends BaseHub {
     return this.hubDevice.writeToCharacteristic(uuid, message)
   }
 
-  public subscribe({
-    portId,
-    mode
-  }: {
-    portId: number
-    deviceType?: number
-    mode: number
-  }) {
+  public subscribe({ portId, mode }: { portId: number; mode: number }) {
     return this.send(
       Buffer.from([0x41, portId, mode, 0x01, 0x00, 0x00, 0x00, 0x01]),
       Consts.BLECharacteristic.LPF2_ALL
@@ -237,17 +230,15 @@ export class LPF2Hub extends BaseHub {
   private async _parsePortMessage(message: Buffer) {
     const portId = message[3]
     const event = message[4]
-    const maybeDeviceType = message.readUInt16LE(5) as DeviceNumber
-    const deviceType: DeviceNumber = event ? maybeDeviceType : 0
+    const maybeDeviceId = message.readUInt16LE(5) as DeviceId
+    const deviceId: DeviceId = event ? maybeDeviceId : 0
 
     if (event === Consts.Event.ATTACHED_IO) {
       if (modeInfoDebug.enabled) {
-        const deviceTypeName = deviceNamesByNumber[message[5]] || 'Unknown'
+        const deviceName =
+          deviceNamesById[message[5]] || ('Unknown' as DeviceName)
         modeInfoDebug(
-          `Port ${toHex(portId)}, type ${toHex(
-            deviceType,
-            4
-          )} (${deviceTypeName})`
+          `Port ${toHex(portId)}, type ${toHex(deviceId, 4)} (${deviceName})`
         )
         const hwVersion = decodeVersion(message.readInt32LE(7))
         const swVersion = decodeVersion(message.readInt32LE(11))
@@ -261,7 +252,7 @@ export class LPF2Hub extends BaseHub {
 
       const device = createDeviceByType({
         hub: this,
-        deviceNumber: deviceType,
+        deviceNumber: deviceId,
         portId
       })
       this.attachDevice(device)
@@ -288,7 +279,7 @@ export class LPF2Hub extends BaseHub {
       this._virtualPorts.push(virtualPortId)
       const device = createDeviceByType({
         hub: this,
-        deviceNumber: deviceType,
+        deviceNumber: deviceId,
         portId: virtualPortId
       })
       this.attachDevice(device)

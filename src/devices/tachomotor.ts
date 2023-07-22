@@ -19,7 +19,7 @@ export class TachoMotor extends BasicMotor {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.rotate) {
       const degrees = message.readInt32LE(this.isWeDo2SmartHub ? 2 : 4)

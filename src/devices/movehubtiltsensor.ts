@@ -12,7 +12,7 @@ export class MoveHubTiltSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.tilt) {
       const x = -message.readInt8(4)

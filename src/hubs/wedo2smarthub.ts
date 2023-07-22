@@ -1,8 +1,8 @@
 import Debug from 'debug'
 
 import * as Consts from '../consts.js'
-import { createDeviceByType } from '../createDeviceByType.js'
-import { DeviceNumber } from '../device-type.js'
+import { createDeviceByType } from '../create-device-by-type.js'
+import { DeviceId } from '../device-ids.js'
 import { HubDevice } from '../hub-device.js'
 import { ServiceIds } from '../hub-type.js'
 import { BaseHub } from './basehub.js'
@@ -121,11 +121,11 @@ export class WeDo2SmartHub extends BaseHub {
 
   public subscribe({
     portId,
-    deviceType,
+    deviceId,
     mode
   }: {
     portId: number
-    deviceType: number
+    deviceId: DeviceId
     mode: number
   }) {
     this.send(
@@ -133,7 +133,7 @@ export class WeDo2SmartHub extends BaseHub {
         0x01,
         0x02,
         portId,
-        deviceType,
+        deviceId,
         mode,
         0x01,
         0x00,
@@ -148,11 +148,11 @@ export class WeDo2SmartHub extends BaseHub {
 
   public unsubscribe({
     portId,
-    deviceType,
+    deviceId,
     mode
   }: {
     portId: number
-    deviceType: number
+    deviceId: DeviceId
     mode: number
   }) {
     this.send(
@@ -160,7 +160,7 @@ export class WeDo2SmartHub extends BaseHub {
         0x01,
         0x02,
         portId,
-        deviceType,
+        deviceId,
         mode,
         0x01,
         0x00,
@@ -209,16 +209,16 @@ export class WeDo2SmartHub extends BaseHub {
   private _parsePortMessage(data: Buffer) {
     debug('Received Message (WEDO2_PORT_TYPE)', data)
 
-    const portId = data[0] as DeviceNumber
-    const event = data[1] as DeviceNumber
-    const maybeDeviceType = data[3] as DeviceNumber
+    const portId = data[0] as DeviceId
+    const event = data[1] as DeviceId
+    const maybeDeviceId = data[3] as DeviceId
 
-    const deviceType: DeviceNumber = event ? maybeDeviceType : 0
+    const deviceId: DeviceId = event ? maybeDeviceId : 0
 
     if (event === 1) {
       const device = createDeviceByType({
         hub: this,
-        deviceNumber: deviceType,
+        deviceNumber: deviceId,
         portId
       })
       this.attachDevice(device)

@@ -12,7 +12,7 @@ export class MotionSensor extends Device {
   }
 
   public receive(message: Buffer) {
-    const mode = this._mode
+    const mode = this.mode
 
     if (mode === this.modes.distance) {
       let distance = message[this.isWeDo2SmartHub ? 2 : 4]
