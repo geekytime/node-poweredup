@@ -1,27 +1,24 @@
-/*
- *
- * This demonstrates connecting to LEGO Super Mario.
- *
- */
+import { Mario, Scanner } from '../dist/node/index-node.js'
 
-import PoweredUP from '..'
+const run = async () => {
+  console.log('Looking for Mario...')
+  const scanner = await Scanner.create()
 
-const poweredUP = new PoweredUP.PoweredUP()
-poweredUP.scan() // Start scanning for hubs
+  const hub = await scanner.connectToHub()
+  console.log(`Connected to ${hub.name}!`)
 
-console.log('Looking for Mario...')
-
-poweredUP.on('discover', async (hub) => {
-  // Wait to discover hubs
-
-  if (hub instanceof PoweredUP.Mario) {
+  if (hub instanceof Mario) {
     const mario = hub
-    await mario.connect() // Connect to Mario
-    console.log(`Connected to Mario!`)
 
-    mario.on('gesture', (_, { gesture }) => {
-      console.log('Gesture', gesture)
-    })
+    console.log(`Connected to Mario!`, mario)
+
+    // mario.on('move', (_, data) => {
+    //   console.log('move', data)
+    // })
+
+    // mario.on('gesture', (_, { gesture }) => {
+    //   console.log('Gesture', gesture)
+    // })
 
     mario.on('pants', (_, { pants }) => {
       console.log('Pants detected', pants)
@@ -39,4 +36,13 @@ poweredUP.on('discover', async (hub) => {
       console.log('Mario disconnected')
     })
   }
-})
+}
+
+run().then(
+  () => {
+    console.log("Let's a go!")
+  },
+  (error) => {
+    console.error(error)
+  }
+)

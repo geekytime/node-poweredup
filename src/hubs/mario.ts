@@ -4,7 +4,7 @@ import * as Consts from '../consts.js'
 import { HubDevice } from '../hub-device.js'
 import { LPF2Hub } from './lpf2hub.js'
 
-const debug = Debug('movehub')
+const debug = Debug('mario')
 
 export class Mario extends LPF2Hub {
   constructor(device: HubDevice) {

@@ -63,10 +63,11 @@ export class TechnicColorSensor extends Device {
     secondSegment: number,
     thirdSegment: number
   ) {
-    this.writeDirect(
-      0x03,
-      Buffer.from([firstSegment, secondSegment, thirdSegment])
-    )
+    const data = Buffer.from([firstSegment, secondSegment, thirdSegment])
+    this.writeDirect({
+      mode: 0x03,
+      data
+    })
   }
 
   modes = {

@@ -48,10 +48,11 @@ export class TechnicDistanceSensor extends Device {
     topRight: number,
     bottomRight: number
   ) {
-    this.writeDirect(
-      0x05,
-      Buffer.from([topLeft, topRight, bottomLeft, bottomRight])
-    )
+    const data = Buffer.from([topLeft, topRight, bottomLeft, bottomRight])
+    this.writeDirect({
+      mode: 0x05,
+      data
+    })
   }
 
   modes = {

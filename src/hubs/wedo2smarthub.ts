@@ -77,16 +77,23 @@ export class WeDo2SmartHub extends BaseHub {
     )
   }
 
+  public writeDirect({ portId, data }: { portId: number; data: Buffer }) {
+    return this.send({
+      message: Buffer.concat([Buffer.from([portId, 0x01, 0x02]), data]),
+      characteristic: Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
+    })
+  }
+
   /**
    * Shutdown the Hub.
    * @method WeDo2SmartHub#shutdown
    * @returns {Promise} Resolved upon successful disconnect.
    */
   public shutdown() {
-    return this.send(
-      Buffer.from([0x00]),
-      Consts.BLECharacteristic.WEDO2_DISCONNECT
-    )
+    return this.send({
+      message: Buffer.from([0x00]),
+      characteristic: Consts.BLECharacteristic.WEDO2_DISCONNECT
+    })
   }
 
   /**
@@ -100,23 +107,30 @@ export class WeDo2SmartHub extends BaseHub {
       throw new Error('Name must be 14 characters or less')
     }
     return new Promise<void>((resolve) => {
-      const data = Buffer.from(name, 'ascii')
+      const message = Buffer.from(name, 'ascii')
+      const characteristic = Consts.BLECharacteristic.WEDO2_NAME_ID
       // Send this twice, as sometimes the first time doesn't take
-      this.send(data, Consts.BLECharacteristic.WEDO2_NAME_ID)
-      this.send(data, Consts.BLECharacteristic.WEDO2_NAME_ID)
+      this.send({ message, characteristic })
+      this.send({ message, characteristic })
       this._name = name
       return resolve()
     })
   }
 
-  public async send(message: Buffer, uuid: string) {
+  public async send({
+    message,
+    characteristic
+  }: {
+    message: Buffer
+    characteristic: string
+  }) {
     if (debug.enabled) {
       debug(
-        `Sent Message (${this._getCharacteristicNameFromUUID(uuid)})`,
+        `Sent Message (${this._getCharacteristicNameFromUUID(characteristic)})`,
         message
       )
     }
-    return this.hubDevice.writeToCharacteristic(uuid, message)
+    return this.hubDevice.writeToCharacteristic(characteristic, message)
   }
 
   public subscribe({
@@ -128,22 +142,21 @@ export class WeDo2SmartHub extends BaseHub {
     deviceId: DeviceId
     mode: number
   }) {
-    this.send(
-      Buffer.from([
-        0x01,
-        0x02,
-        portId,
-        deviceId,
-        mode,
-        0x01,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x01
-      ]),
-      Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
-    )
+    const message = Buffer.from([
+      0x01,
+      0x02,
+      portId,
+      deviceId,
+      mode,
+      0x01,
+      0x00,
+      0x00,
+      0x00,
+      0x00,
+      0x01
+    ])
+    const characteristic = Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
+    this.send({ message, characteristic })
   }
 
   public unsubscribe({
@@ -155,22 +168,21 @@ export class WeDo2SmartHub extends BaseHub {
     deviceId: DeviceId
     mode: number
   }) {
-    this.send(
-      Buffer.from([
-        0x01,
-        0x02,
-        portId,
-        deviceId,
-        mode,
-        0x01,
-        0x00,
-        0x00,
-        0x00,
-        0x00,
-        0x00
-      ]),
-      Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
-    )
+    const message = Buffer.from([
+      0x01,
+      0x02,
+      portId,
+      deviceId,
+      mode,
+      0x01,
+      0x00,
+      0x00,
+      0x00,
+      0x00,
+      0x00
+    ])
+    const characteristic = Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
+    this.send({ message, characteristic })
   }
 
   private _getCharacteristicNameFromUUID(uuid: string) {

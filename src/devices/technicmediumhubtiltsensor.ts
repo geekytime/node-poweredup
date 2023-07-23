@@ -46,10 +46,10 @@ export class TechnicMediumHubTiltSensor extends Device {
    */
   public setImpactCount(count: number) {
     return new Promise<void>((resolve) => {
-      const payload = Buffer.alloc(4)
-      payload.writeUInt32LE(count % 2 ** 32)
+      const data = Buffer.alloc(4)
+      data.writeUInt32LE(count % 2 ** 32)
       // no need to subscribe, can be set in different mode
-      this.writeDirect(0x01, payload)
+      this.writeDirect({ mode: 0x01, data })
       return resolve()
     })
   }
@@ -63,10 +63,11 @@ export class TechnicMediumHubTiltSensor extends Device {
   public setImpactThreshold(threshold: number) {
     this._impactThreshold = threshold
     return new Promise<void>((resolve) => {
-      this.writeDirect(
-        0x02,
-        Buffer.from([this._impactThreshold, this._impactHoldoff])
-      )
+      const data = Buffer.from([this._impactThreshold, this._impactHoldoff])
+      this.writeDirect({
+        mode: 0x02,
+        data
+      })
       return resolve()
     })
   }
@@ -80,10 +81,11 @@ export class TechnicMediumHubTiltSensor extends Device {
   public setImpactHoldoff(holdoff: number) {
     this._impactHoldoff = holdoff
     return new Promise<void>((resolve) => {
-      this.writeDirect(
-        0x02,
-        Buffer.from([this._impactThreshold, this._impactHoldoff])
-      )
+      const data = Buffer.from([this._impactThreshold, this._impactHoldoff])
+      this.writeDirect({
+        mode: 0x02,
+        data
+      })
       return resolve()
     })
   }

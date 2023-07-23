@@ -18,7 +18,7 @@ export class LPF2Hub extends BaseHub {
   } = {}
 
   public async connect() {
-    debug('LPF2Hub connecting')
+    debug('connecting...')
     await super.connect()
     await this.hubDevice.discoverCharacteristicsForService(ServiceIds.LPF2_HUB)
     this.hubDevice.subscribeToCharacteristic(
@@ -38,47 +38,86 @@ export class LPF2Hub extends BaseHub {
       Consts.HubPropertyPayload.PRIMARY_MAC_ADDRESS
     )
     this.emit('connect', this)
-    debug('LPF2Hub connected')
+    debug('...connected!')
   }
 
   public shutdown() {
-    return this.send(
-      Buffer.from([0x02, 0x01]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+    const message = Buffer.from([0x02, 0x01])
+    return this.send({ message })
   }
 
   public async setName(name: string) {
     if (name.length > 14) {
       throw new Error('Name must be 14 characters or less')
     }
-    let data = Buffer.from([0x01, 0x01, 0x01])
-    data = Buffer.concat([data, Buffer.from(name, 'ascii')])
+    const data = Buffer.from([0x01, 0x01, 0x01])
+    const message = Buffer.concat([data, Buffer.from(name, 'ascii')])
     // Send this twice, as sometimes the first time doesn't take
-    await this.send(data, Consts.BLECharacteristic.LPF2_ALL)
-    await this.send(data, Consts.BLECharacteristic.LPF2_ALL)
+    await this.send({ message })
+    await this.send({ message })
     this._name = name
   }
 
-  public send(message: Buffer, uuid: string) {
+  public writeDirect({
+    portId,
+    mode,
+    data
+  }: {
+    portId: number
+    mode: number
+    data: Buffer
+  }) {
+    const message = Buffer.concat([
+      Buffer.from([0x81, portId, 0x11, 0x51, mode]),
+      data
+    ])
+    const characteristic = Consts.BLECharacteristic.LPF2_ALL
+    return this.send({
+      message,
+      characteristic
+    })
+  }
+
+  public send({
+    message,
+    characteristic = Consts.BLECharacteristic.LPF2_ALL
+  }: {
+    message: Buffer
+    characteristic?: string
+  }) {
     message = Buffer.concat([Buffer.alloc(2), message])
     message[0] = message.length
-    debug('Sent Message (LPF2_ALL)', message)
-    return this.hubDevice.writeToCharacteristic(uuid, message)
+    debug('send', message)
+    return this.hubDevice.writeToCharacteristic(characteristic, message)
   }
 
   public subscribe({ portId, mode }: { portId: number; mode: number }) {
-    return this.send(
-      Buffer.from([0x41, portId, mode, 0x01, 0x00, 0x00, 0x00, 0x01]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+    debug('subscribe', { portId, mode })
+    const message = Buffer.from([
+      0x41,
+      portId,
+      mode,
+      0x01,
+      0x00,
+      0x00,
+      0x00,
+      0x01
+    ])
+    return this.send({ message })
   }
 
   public unsubscribe({ portId, mode }: { portId: number; mode: number }) {
-    return this.send(
-      Buffer.from([0x41, portId, mode, 0x01, 0x00, 0x00, 0x00, 0x00]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+    const message = Buffer.from([
+      0x41,
+      portId,
+      mode,
+      0x01,
+      0x00,
+      0x00,
+      0x00,
+      0x00
+    ])
+    return this.send({ message })
   }
 
   /**
@@ -104,10 +143,14 @@ export class LPF2Hub extends BaseHub {
         `Both devices must be of the same type to create a virtual port`
       )
     }
-    return this.send(
-      Buffer.from([0x61, 0x01, firstDevice.portId, secondDevice.portId]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+
+    const message = Buffer.from([
+      0x61,
+      0x01,
+      firstDevice.portId,
+      secondDevice.portId
+    ])
+    return this.send({ message })
   }
 
   protected _checkFirmware(_version: string) {
@@ -128,9 +171,10 @@ export class LPF2Hub extends BaseHub {
       const message = this._messageBuffer.slice(0, len)
       this._messageBuffer = this._messageBuffer.slice(len)
 
-      debug('Received Message (LPF2_ALL)', message)
+      const messageType = message[2]
+      debug('received messageType', messageType)
 
-      switch (message[2]) {
+      switch (messageType) {
         case Consts.MessageType.HUB_PROPERTIES: {
           const property = message[3]
           const callback = this._propertyRequestCallbacks[property]
@@ -176,18 +220,14 @@ export class LPF2Hub extends BaseHub {
         this._parseHubPropertyResponse(message)
         return resolve()
       }
-      this.send(
-        Buffer.from([0x01, property, 0x05]),
-        Consts.BLECharacteristic.LPF2_ALL
-      )
+      const message = Buffer.from([0x01, property, 0x05])
+      this.send({ message })
     })
   }
 
   private _requestHubPropertyReports(property: number) {
-    return this.send(
-      Buffer.from([0x01, property, 0x02]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+    const message = Buffer.from([0x01, property, 0x02])
+    return { message }
   }
 
   private _parseHubPropertyResponse(message: Buffer) {
@@ -232,6 +272,8 @@ export class LPF2Hub extends BaseHub {
     const event = message[4]
     const maybeDeviceId = message.readUInt16LE(5) as DeviceId
     const deviceId: DeviceId = event ? maybeDeviceId : 0
+
+    debug('port message', { portId, event, deviceId })
 
     if (event === Consts.Event.ATTACHED_IO) {
       if (modeInfoDebug.enabled) {
@@ -287,14 +329,12 @@ export class LPF2Hub extends BaseHub {
   }
 
   private async _sendPortInformationRequest(port: number) {
-    await this.send(
-      Buffer.from([0x21, port, 0x01]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
-    await this.send(
-      Buffer.from([0x21, port, 0x02]),
-      Consts.BLECharacteristic.LPF2_ALL
-    ) // Mode combinations
+    // HACK: What is this message?
+    const message1 = Buffer.from([0x21, port, 0x01])
+    await this.send({ message: message1 })
+
+    const modeCombinationsMessage = Buffer.from([0x21, port, 0x02])
+    await this.send({ message: modeCombinationsMessage })
   }
 
   private async _parsePortInformationResponse(message: Buffer) {
@@ -359,10 +399,8 @@ export class LPF2Hub extends BaseHub {
     mode: number,
     type: number
   ) {
-    return this.send(
-      Buffer.from([0x22, port, mode, type]),
-      Consts.BLECharacteristic.LPF2_ALL
-    )
+    const message = Buffer.from([0x22, port, mode, type])
+    return this.send({ message })
   }
 
   private _parseModeInformationResponse(message: Buffer) {

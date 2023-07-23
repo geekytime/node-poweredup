@@ -72,7 +72,7 @@ export class TachoMotor extends BasicMotor {
       profile
     ])
     message.writeUInt16LE(time, 4)
-    this.send(message)
+    this.send({ message })
   }
 
   /**
@@ -92,7 +92,7 @@ export class TachoMotor extends BasicMotor {
       profile
     ])
     message.writeUInt16LE(time, 4)
-    this.send(message)
+    this.send({ message })
   }
 
   /**

@@ -1,8 +1,11 @@
+import Debug from 'debug'
 import { EventEmitter } from 'events'
 
 import * as Consts from '../consts.js'
 import { DeviceId, deviceNamesById } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
+
+const debug = Debug('device')
 
 export type DeviceConnectionState = 'connected' | 'disconnected'
 
@@ -82,29 +85,25 @@ export abstract class Device extends EventEmitter {
     return deviceNamesById[this.type]
   }
 
-  public writeDirect(mode: number, data: Buffer) {
-    if (this.isWeDo2SmartHub) {
-      return this.send(
-        Buffer.concat([Buffer.from([this.portId, 0x01, 0x02]), data]),
-        Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
-      )
-    } else {
-      return this.send(
-        Buffer.concat([
-          Buffer.from([0x81, this.portId, 0x11, 0x51, mode]),
-          data
-        ]),
-        Consts.BLECharacteristic.LPF2_ALL
-      )
-    }
+  public writeDirect({ mode, data }: { mode: number; data: Buffer }) {
+    this.hub.writeDirect({
+      portId: this.portId,
+      mode,
+      data
+    })
   }
 
-  public send(
-    data: Buffer,
-    characteristic: string = Consts.BLECharacteristic.LPF2_ALL
-  ) {
-    this.assertConnected()
-    return this.hub.send(data, characteristic)
+  public send({
+    message,
+    characteristic = Consts.BLECharacteristic.LPF2_ALL
+  }: {
+    message: Buffer
+    characteristic?: string
+  }) {
+    this.hub.send({
+      message,
+      characteristic
+    })
   }
 
   public subscribe(mode: number) {
@@ -120,6 +119,7 @@ export abstract class Device extends EventEmitter {
   }
 
   public receive(message: Buffer) {
+    debug('receive', message)
     this.notify('receive', { message })
   }
 
@@ -132,7 +132,12 @@ export abstract class Device extends EventEmitter {
   }
 
   public requestUpdate() {
-    this.send(Buffer.from([0x21, this.portId, 0x00]))
+    const message = Buffer.from([0x21, this.portId, 0x00])
+    this.hub.send({
+      message,
+      // HACK: Should we really be assuming this characteristic is always LPF2_ALL?
+      characteristic: Consts.BLECharacteristic.LPF2_ALL
+    })
   }
 
   public finish(message: number) {

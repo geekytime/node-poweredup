@@ -1,6 +1,10 @@
+import Debug from 'debug'
+
 import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
+
+const debug = Debug('mario')
 
 /**
  * @class MarioPantsSensor
@@ -15,6 +19,7 @@ export class MarioPantsSensor extends Device {
     const mode = this.mode
 
     if (mode === this.modes.pants) {
+      debug('pants', message)
       /**
        * Emits when the user changes the pants on Mario.
        * @event MarioPantsSensor#pants

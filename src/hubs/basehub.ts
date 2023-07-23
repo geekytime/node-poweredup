@@ -168,9 +168,17 @@ export abstract class BaseHub extends EventEmitter {
     return Promise.all(commands)
   }
 
-  public send(_message: Buffer, _uuid: string) {
-    return Promise.resolve()
-  }
+  public abstract writeDirect({
+    portId,
+    mode,
+    data
+  }: {
+    portId: number
+    mode: number
+    data: Buffer
+  })
+
+  public abstract send(args: { message: Buffer; characteristic: string })
 
   public abstract subscribe(_: {
     portId: number
@@ -212,6 +220,8 @@ export abstract class BaseHub extends EventEmitter {
   }
 
   protected attachDevice(device: Device) {
+    const { portId, type, deviceId } = device
+    debug('attachDevice', { portId, type, deviceId })
     const existingDevice = this.getDeviceByPortId(device.portId)
     if (existingDevice && existingDevice.type === device.type) {
       return

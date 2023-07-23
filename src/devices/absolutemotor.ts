@@ -82,7 +82,7 @@ export class AbsoluteMotor extends TachoMotor {
         ])
         message.writeInt32LE(normalizeAngle(angle), 4)
       }
-      this.send(message)
+      this.send({ message })
       this._finishedCallbacks.push(() => {
         return resolve()
       })
@@ -127,7 +127,7 @@ export class AbsoluteMotor extends TachoMotor {
    */
   public resetZero() {
     return new Promise<void>((resolve) => {
-      const data = Buffer.from([
+      const message = Buffer.from([
         0x81,
         this.portId,
         0x11,
@@ -138,7 +138,7 @@ export class AbsoluteMotor extends TachoMotor {
         0x00,
         0x00
       ])
-      this.send(data)
+      this.send({ message })
       return resolve()
     })
   }

@@ -3,6 +3,7 @@ import noble from '@abandonware/noble'
 import Debug from 'debug'
 import { EventEmitter } from 'events'
 
+import { createHub } from './create-hub.js'
 import { ServiceIds } from './hub-type.js'
 import { BaseHub } from './hubs/basehub.js'
 import { Hub } from './hubs/hub.js'
@@ -108,7 +109,7 @@ export class Scanner extends EventEmitter {
   private handleDiscovery = async (peripheral: Peripheral) => {
     peripheral.removeAllListeners()
 
-    const hub = await Hub.fromPeripheral(peripheral)
+    const hub = await createHub(peripheral)
     hub.on('connect', this.handleHubConnect)
     hub.on('disconnect', this.handleHubDisconnect)
 

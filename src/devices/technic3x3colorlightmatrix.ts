@@ -37,7 +37,8 @@ export class Technic3x3ColorLightMatrix extends Device {
           colorArray[i] = (colors[i] as number) + (10 << 4) // If a raw color value, set it to max brightness (10)
         }
       }
-      this.writeDirect(this.modes.pix, Buffer.from(colorArray))
+      const data = Buffer.from(colorArray)
+      this.writeDirect({ mode: this.modes.pix, data })
       return resolve()
     })
   }

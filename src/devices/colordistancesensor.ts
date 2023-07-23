@@ -209,11 +209,11 @@ export class ColorDistanceSensor extends Device {
         'Power Functions IR is not available on the WeDo 2.0 Smart Hub'
       )
     } else {
-      const payload = Buffer.alloc(2)
-      payload[0] = (message[0] << 4) + (message[1] >> 4)
-      payload[1] = message[0] >> 4
+      const data = Buffer.alloc(2)
+      data[0] = (message[0] << 4) + (message[1] >> 4)
+      data[1] = message[0] >> 4
       this.subscribe(this.modes.powerFunctionsIr)
-      return this.writeDirect(0x07, payload)
+      return this.writeDirect({ mode: this.modes.powerFunctionsIr, data })
     }
   }
 
@@ -234,7 +234,8 @@ export class ColorDistanceSensor extends Device {
         )
       } else {
         this.subscribe(this.modes.led)
-        this.writeDirect(0x05, Buffer.from([color as number]))
+        const data = Buffer.from([color as number])
+        this.writeDirect({ mode: this.modes.led, data })
       }
       return resolve()
     })
@@ -253,10 +254,10 @@ export class ColorDistanceSensor extends Device {
           'Setting distance count is not available on the WeDo 2.0 Smart Hub'
         )
       } else {
-        const payload = Buffer.alloc(4)
-        payload.writeUInt32LE(count % 2 ** 32)
+        const data = Buffer.alloc(4)
+        data.writeUInt32LE(count % 2 ** 32)
         // no need to subscribe, can be set in different mode
-        this.writeDirect(0x02, payload)
+        this.writeDirect({ mode: this.modes.distanceCount, data })
       }
       return resolve()
     })

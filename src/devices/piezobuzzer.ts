@@ -17,10 +17,13 @@ export class PiezoBuzzer extends Device {
    */
   public playTone(frequency: number, time: number) {
     return new Promise((resolve) => {
-      const data = Buffer.from([0x05, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00])
-      data.writeUInt16LE(frequency, 3)
-      data.writeUInt16LE(time, 5)
-      this.send(data, Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE)
+      const message = Buffer.from([0x05, 0x02, 0x04, 0x00, 0x00, 0x00, 0x00])
+      message.writeUInt16LE(frequency, 3)
+      message.writeUInt16LE(time, 5)
+      this.send({
+        message,
+        characteristic: Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
+      })
       global.setTimeout(resolve, time)
     })
   }

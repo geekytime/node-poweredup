@@ -23,7 +23,7 @@ export class Light extends Device {
       this.cancelEventTimer()
     }
     return new Promise<void>((resolve) => {
-      this.writeDirect(0x00, Buffer.from([brightness]))
+      this.writeDirect({ mode: 0x00, data: Buffer.from([brightness]) })
       return resolve()
     })
   }

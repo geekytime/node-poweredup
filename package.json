@@ -13,6 +13,7 @@
     "build": "swc src -d dist/node",
     "docs": "jsdoc -c .jsdoc.json",
     "example": "pnpm run build && node ./examples/sample-usage.js",
+    "mario": "pnpm run build && node ./examples/mario.js",
     "lint": "eslint \"./src/**/*.ts\"",
     "prepublishOnly": "pnpm run lint && pnpm run build"
   },

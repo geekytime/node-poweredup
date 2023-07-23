@@ -15,11 +15,12 @@ export class BasicMotor extends Device {
    * @param {number} power For forward, a value between 1 - 100 should be set. For reverse, a value between -1 to -100. Stop is 0.
    * @returns {Promise} Resolved upon successful issuance of the command.
    */
-  public setPower(power: number, interrupt: boolean = true) {
+  public setPower(powerPercent: number, interrupt: boolean = true) {
     if (interrupt) {
       this.cancelEventTimer()
     }
-    return this.writeDirect(0x00, Buffer.from([mapSpeed(power)]))
+    const data = Buffer.from([mapSpeed(powerPercent)])
+    return this.writeDirect({ mode: 0, data })
   }
 
   /**

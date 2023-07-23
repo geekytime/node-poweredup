@@ -1,11 +1,11 @@
+import Debug from 'debug'
+
 import { deviceIdsByName } from '../device-ids.js'
 import { BaseHub } from '../hubs/basehub.js'
 import { Device } from './device.js'
 
-/**
- * @class MarioBarcodeSensor
- * @extends Device
- */
+const debug = Debug('mario')
+
 export class MarioBarcodeSensor extends Device {
   constructor(hub: BaseHub, portId: number) {
     super(hub, portId, deviceIdsByName.MarioBarcodeSensor)
@@ -24,10 +24,10 @@ export class MarioBarcodeSensor extends Device {
       const barcode = message.readUInt16LE(4)
       const color = message.readUInt16LE(6)
       if (color === 0xffff) {
-        // This is a barcode
+        debug('barcode', barcode)
         this.notify('barcode', { barcode })
       } else if (barcode === 0xffff) {
-        // This is a color
+        debug('color', color)
         this.notify('barcode', { color })
       }
     } else if (mode === this.modes.rgb) {
@@ -42,6 +42,7 @@ export class MarioBarcodeSensor extends Device {
       const r = message[4]
       const g = message[5]
       const b = message[6]
+      debug('rgb', { r, g, b })
       this.notify('rgb', { r, g, b })
     }
   }

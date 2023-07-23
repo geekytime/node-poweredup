@@ -24,17 +24,17 @@ export class HubLED extends Device {
         color = 0
       }
       if (this.isWeDo2SmartHub) {
-        this.send(
-          Buffer.from([0x06, 0x17, 0x01, 0x01]),
-          Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
-        )
-        this.send(
-          Buffer.from([0x06, 0x04, 0x01, color]),
-          Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
-        )
+        this.send({
+          message: Buffer.from([0x06, 0x17, 0x01, 0x01]),
+          characteristic: Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
+        })
+        this.send({
+          message: Buffer.from([0x06, 0x04, 0x01, color]),
+          characteristic: Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
+        })
       } else {
         this.subscribe(this.modes.color)
-        this.writeDirect(0x00, Buffer.from([color]))
+        this.writeDirect({ mode: 0x00, data: Buffer.from([color]) })
       }
       return resolve()
     })
@@ -51,17 +51,17 @@ export class HubLED extends Device {
   public setRGB(red: number, green: number, blue: number) {
     return new Promise<void>((resolve) => {
       if (this.isWeDo2SmartHub) {
-        this.send(
-          Buffer.from([0x06, 0x17, 0x01, 0x02]),
-          Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
-        )
-        this.send(
-          Buffer.from([0x06, 0x04, 0x03, red, green, blue]),
-          Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
-        )
+        this.send({
+          message: Buffer.from([0x06, 0x17, 0x01, 0x02]),
+          characteristic: Consts.BLECharacteristic.WEDO2_PORT_TYPE_WRITE
+        })
+        this.send({
+          message: Buffer.from([0x06, 0x04, 0x03, red, green, blue]),
+          characteristic: Consts.BLECharacteristic.WEDO2_MOTOR_VALUE_WRITE
+        })
       } else {
         this.subscribe(this.modes.rgb)
-        this.writeDirect(0x01, Buffer.from([red, green, blue]))
+        this.writeDirect({ mode: 1, data: Buffer.from([red, green, blue]) })
       }
       return resolve()
     })
